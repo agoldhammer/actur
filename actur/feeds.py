@@ -27,3 +27,9 @@ corriere = Publication(
     name="Corriere della Sera",
     feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
 )
+
+europapers = [lemonde, sz, corriere]
+
+
+def get_papers() -> List[Publication]:
+    return europapers

@@ -1,18 +1,12 @@
-"""Main module."""
 import feedparser
 
 # import pprint
 
-from feeds import lemonde, sz, corriere
-
-# import feeds
-
-# print(lemonde, corriere, sz)
-
-# current_feed = lemonde
+import feeds
+from typing import Type
 
 
-def parse_pub(pub):
+def parse_pub(pub: Type[feeds.Publication]):
     pubname = pub.name
     feed = pub.feeds[0]  # do only first feed
     feedname = feed.name
@@ -36,5 +30,5 @@ def parse_pub(pub):
         # print(entry.summary)
 
 
-for pub in [lemonde, sz, corriere]:
+for pub in feeds.get_papers():
     parse_pub(pub)
