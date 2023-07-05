@@ -5,35 +5,36 @@ import feedparser
 
 from feeds import lemonde, sz, corriere
 
-print(lemonde, corriere, sz)
+# import feeds
 
-current_feed = lemonde
+# print(lemonde, corriere, sz)
 
-name = current_feed.name
-feed = current_feed.feeds[0]
-feedname = feed.name
-url = feed.url
+# current_feed = lemonde
 
-d = feedparser.parse(url)
-print("version", d.version)
-print("bozo/status", d.bozo, d.status)
-# print(d)
-# print(d["feed"]["title"])
-# print(d["feed"]["updated"])
-# print(d.feed.title)
-print("Pubname", name)
-print("Feed:", feedname)
-# print("channel title", d.feed.keys())
-# print("d.channel", d.channel.keys())
-# pprint.pprint(d)
-print("d keys", d.keys())
-print("no. entries", len(d.entries))
-for entry in d.entries:
-    # pprint.pprint(entry)
-    # print("author", entry.author)
-    print("date", entry.published)
-    print("link", entry.link)
-    print("summary", entry.summary)
-    print("----------------\n")
-    # print(entry.link)
-    # print(entry.summary)
+
+def parse_pub(pub):
+    pubname = pub.name
+    feed = pub.feeds[0]  # do only first feed
+    feedname = feed.name
+    url = feed.url
+    print("Pubname", pubname)
+    print("Feed:", feedname)
+    d = feedparser.parse(url)
+    print("version", d.version)
+    print("bozo/status", d.bozo, d.status)
+    # print("d keys", d.keys())
+    print("no. entries", len(d.entries))
+    for entry in d.entries:
+        # pprint.pprint(entry)
+        print("id", entry.id)
+        # print("author", entry.author)
+        print("date", entry.published)
+        print("link", entry.link)
+        print("summary", entry.summary)
+        print("----------------\n")
+        # print(entry.link)
+        # print(entry.summary)
+
+
+for pub in [lemonde, sz, corriere]:
+    parse_pub(pub)
