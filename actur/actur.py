@@ -1,7 +1,7 @@
 """Main module."""
 import feedparser
 
-import pprint
+# import pprint
 
 from feeds import lemonde, sz, corriere
 
@@ -37,17 +37,3 @@ for entry in d.entries:
     print("----------------\n")
     # print(entry.link)
     # print(entry.summary)
-
-# print("channel by items")
-# print("channel title", d.channel.title)
-# for item in d.channel.items():
-#     pprint.pprint(item)
-# print("channel links\n")
-# pprint.pprint(d.channel.links)
-# print("namespaces", d.namespaces)
-# print("feedkeys")
-# pprint.pprint(d.feed.keys())
-# print("feed links", d.feed.links)
-# print("feed summary", d.feed.summary)
-# print(d.updated)
-# print(d.channel.description)
