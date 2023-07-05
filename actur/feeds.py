@@ -22,3 +22,8 @@ lemonde = Publication(
 sz = Publication(
     name="SZ", feeds=[Feed("TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen")]
 )
+
+corriere = Publication(
+    name="Corriere della Sera",
+    feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
+)

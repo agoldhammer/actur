@@ -1,10 +1,11 @@
 """Main module."""
 import feedparser
+
 import pprint
 
-from feeds import lemonde, sz
+from feeds import lemonde, sz, corriere
 
-print(lemonde, sz)
+print(lemonde, corriere, sz)
 
 current_feed = lemonde
 
@@ -29,8 +30,13 @@ print("d keys", d.keys())
 print("no. entries", len(d.entries))
 for entry in d.entries:
     # pprint.pprint(entry)
-    print(entry.link)
-    print(entry.summary)
+    # print("author", entry.author)
+    print("date", entry.published)
+    print("link", entry.link)
+    print("summary", entry.summary)
+    print("----------------\n")
+    # print(entry.link)
+    # print(entry.summary)
 
 # print("channel by items")
 # print("channel title", d.channel.title)
