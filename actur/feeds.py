@@ -16,7 +16,7 @@ class Publication:
 
 lemonde = Publication(
     name="LeMonde",
-    feeds=[Feed("Politique", "https://www.lemonde.fr/politique/rss_full.xml)")],
+    feeds=[Feed("Une", "https://www.lemonde.fr/politique/rss_full.xml")],
 )
 
 sz = Publication(

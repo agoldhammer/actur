@@ -4,7 +4,9 @@ import pprint
 
 from feeds import lemonde, sz
 
-current_feed = sz
+print(lemonde, sz)
+
+current_feed = lemonde
 
 name = current_feed.name
 feed = current_feed.feeds[0]
@@ -13,6 +15,7 @@ url = feed.url
 
 d = feedparser.parse(url)
 print("version", d.version)
+print("bozo/status", d.bozo, d.status)
 # print(d)
 # print(d["feed"]["title"])
 # print(d["feed"]["updated"])
@@ -25,12 +28,14 @@ print("Feed:", feedname)
 print("d keys", d.keys())
 print("no. entries", len(d.entries))
 for entry in d.entries:
-    pprint.pprint(entry)
+    # pprint.pprint(entry)
+    print(entry.link)
+    print(entry.summary)
 
-print("channel by items")
-print("channel title", d.channel.title)
-for item in d.channel.items():
-    pprint.pprint(item)
+# print("channel by items")
+# print("channel title", d.channel.title)
+# for item in d.channel.items():
+#     pprint.pprint(item)
 # print("channel links\n")
 # pprint.pprint(d.channel.links)
 # print("namespaces", d.namespaces)
