@@ -16,7 +16,10 @@ class Publication:
 
 lemonde = Publication(
     name="LeMonde",
-    feeds=[Feed("Une", "https://www.lemonde.fr/politique/rss_full.xml")],
+    feeds=[
+        Feed("Une", "https://www.lemonde.fr/politique/rss_full.xml"),
+        # Feed("Politique", "https://www.lemonde.fr/politique/rss_full.xml"),
+    ],
 )
 
 sz = Publication(
@@ -27,3 +30,9 @@ corriere = Publication(
     name="Corriere della Sera",
     feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
 )
+
+europapers = [lemonde, sz, corriere]
+
+
+def get_papers() -> List[Publication]:
+    return europapers
