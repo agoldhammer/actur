@@ -1,9 +1,13 @@
-import feedparser
+import datetime
 
 # import pprint
 
+# from textwrap import TextWrapper
+import dbif
+import feedparser
 import feeds
-from textwrap import TextWrapper
+
+# import pprint
 
 
 def check_hash():
@@ -41,29 +45,40 @@ def process_feed(feed: feeds.Feed):
     print("bozo/status", d.bozo, d.status)
     # print("d keys", d.keys())
     print("no. entries", len(d.entries))
+    save_article = dbif.save_article_fn()
     for entry in d.entries:
         # pprint.pprint(entry)
-        print("type:", type(entry))
+
+        # print("type:", type(entry))
         print("keys:", entry.keys())
-        print("id: ", entry.id)
-        print("title:", entry.title)
-        print("title detail:", entry.title_detail)
+        # print("id: ", entry.id)
+        # print("title:", entry.title)
+        # print("title detail:", entry.title_detail)
         # print("media cotennt:", entry.media_content)
         # print("credit:", entry.credit)
         # print("media credit:", entry.media_credit)
         # print("author", entry.author)
-        print("date:", entry.published, entry.published_parsed)
-        print("link:", entry.link)
-        print("links:", entry.links)
-        wrapper = TextWrapper(
-            width=70, initial_indent="+--->", subsequent_indent="    "
-        )
-        print(wrapper.fill(f"summary: {entry.summary}"))
-        print("summary detail:", entry.summary_detail)
+        # print("date:", entry.published, entry.published_parsed)
+        dt = datetime.datetime(*entry.published_parsed[:6])
+        entry["pubdate"] = dt
+        print("dt", dt)
+        # print("link:", entry.link)
+        # print("links:", entry.links)
+        # wrapper = TextWrapper(
+        #     width=70, initial_indent="+--->", subsequent_indent="    "
+        # )
+        # print(wrapper.fill(f"summary: {entry.summary}"))
+        # print("summary detail:", entry.summary_detail)
         ehash = hash(entry.summary)
-        print("hash:", ehash)
+        entry["hash"] = ehash
+        # print("hash:", entry.hash)
         add_new_hash(ehash)
-        print("----------------\n")
+        print("ENTRY:---------->")
+        # pprint.pprint(entry)
+        # # save to database
+        save_article(entry)
+        print("entry saved")
+        print("END ENTRY----------------\n")
 
 
 def parse_pub(pub: feeds.Publication):
@@ -78,5 +93,15 @@ def parse_pub(pub: feeds.Publication):
     # print(entry.summary)
 
 
-for pub in feeds.get_papers():
-    parse_pub(pub)
+def process_pubs():
+    for pub in feeds.get_papers():
+        parse_pub(pub)
+
+
+def main():
+    dbif.init_db("mongodb://elite.local")
+    process_pubs()
+
+
+if __name__ == "__main__":
+    main()
