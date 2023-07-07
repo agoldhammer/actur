@@ -10,35 +10,31 @@ import feeds
 # import pprint
 
 
-def check_hash():
-    hashes_seen = []
-    hashes_duped = []
+def pcounters():
+    n_processed = 0
+    n_added = 0
+    n_skipped = 0
 
-    def add_hash(newhash):
-        if newhash in hashes_seen:
-            hashes_duped.append(newhash)
-        else:
-            hashes_seen.append(newhash)
+    def bump_processed():
+        nonlocal n_processed
+        n_processed += 1
 
-    def view_dupes():
-        print("+++no. hashes recorded:", len(hashes_seen))
-        nduped = len(hashes_duped)
-        if nduped > 0:
-            print("no. duped hashes:", nduped)
-            print("duped hashes:", hashes_duped)
-        else:
-            print("No duped hashes")
+    def bump_added():
+        nonlocal n_added
+        n_added = n_added + 1
 
-    return add_hash, view_dupes
+    def bump_skipped():
+        nonlocal n_skipped
+        n_skipped = n_skipped + 1
 
+    def counts2str():
+        return f"Processed: {n_processed}, Added: {n_added}, Skipped: {n_skipped}"
 
-add_new_hash, view_duped_hashes = check_hash()
+    return bump_processed, bump_added, bump_skipped, counts2str
 
 
 def process_feed(feed: feeds.Feed):
-    n_processed = 0
-    n_skipped = 0
-    n_saved = 0
+    bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
     url = feed.url
     print("Feed:", feedname)
@@ -50,46 +46,24 @@ def process_feed(feed: feeds.Feed):
     print("no. entries", len(d.entries))
     save_article, is_summary_in_db = dbif.db_setup()
     for entry in d.entries:
-        n_processed += 1
-        # pprint.pprint(entry)
-
-        # print("type:", type(entry))
+        bump_processed()
         print("keys:", entry.keys())
-        # print("id: ", entry.id)
-        # print("title:", entry.title)
-        # print("title detail:", entry.title_detail)
-        # print("media cotennt:", entry.media_content)
-        # print("credit:", entry.credit)
-        # print("media credit:", entry.media_credit)
-        # print("author", entry.author)
-        # print("date:", entry.published, entry.published_parsed)
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
         print("dt", dt)
-        # print("link:", entry.link)
-        # print("links:", entry.links)
-        # wrapper = TextWrapper(
-        #     width=70, initial_indent="+--->", subsequent_indent="    "
-        # )
-        # print(wrapper.fill(f"summary: {entry.summary}"))
-        # print("summary detail:", entry.summary_detail)
         ehash = hash(entry.summary)
         entry["hash"] = ehash
-        # print("hash:", entry.hash)
-        add_new_hash(ehash)
         print("ENTRY:---------->")
-        # pprint.pprint(entry)
-        # # save to database
         already_in = is_summary_in_db(ehash, entry.summary)
         if already_in:
             print("skipping")
-            n_skipped += 1
+            bump_skipped()
         else:
             save_article(entry)
-            n_saved += 1
+            bump_added()
             print("entry saved")
         print("END ENTRY----------------\n")
-    print(f"Processed: {n_processed}, Saved: {n_saved}, Skipped: {n_skipped}")
+    print(get_counts())
 
 
 def parse_pub(pub: feeds.Publication):
@@ -97,11 +71,6 @@ def parse_pub(pub: feeds.Publication):
     print("**********")
     for feed in pub.feeds:
         process_feed(feed)
-    view_duped_hashes()
-    # feed = pub.feeds[0]  # do only first feed
-
-    # print(entry.link)
-    # print(entry.summary)
 
 
 def process_pubs():

@@ -17,7 +17,7 @@ def db_setup():
         _client.actur.articles.insert_one(entry)
 
     def is_summary_in_db(target_hash, summary):
-        print("checking hash", target_hash, type(target_hash))
+        print("checking hash", target_hash, hash(summary))
         articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
         print("found:", len(list(articles_with_target_hash)))
         articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
@@ -43,4 +43,5 @@ if __name__ == "__main__":
     exists = check_exist(7822652997085437942, "dummy")
     exists = check_exist(1201890604943332644, "dummy")
     exists = check_exist(-964779573267868267, "dummy")
+    exists = check_exist(221067534104229741, "dummy")
     print("exists?", exists)
