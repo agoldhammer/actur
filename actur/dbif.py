@@ -16,14 +16,15 @@ def db_setup():
     def save_article(entry):
         _client.actur.articles.insert_one(entry)
 
-    def is_summary_in_db(hash, summary):
-        print("checking hash", hash)
-        articles_with_hash = _client.actur.articles.find({"hash": hash})
+    def is_summary_in_db(target_hash, summary):
+        print("checking hash", target_hash)
+        articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
         # articles_with_hash = _client.actur.articles.find()
-        for article in articles_with_hash:
+        for article in articles_with_target_hash:
             print("dup hash found", article["hash"], article["_id"])
+            print(article["summary"], "xxxxxxxxx\n", summary)
             if article["summary"] == summary:
-                print("dup article found with hash", hash)
+                print("dup article found with hash", target_hash)
                 return True
             else:
                 print("text differs")
@@ -38,4 +39,5 @@ if __name__ == "__main__":
     save_art, check_exist = db_setup()
     exists = check_exist(8526757651552039682, "dummy")
     exists = check_exist(7822652997085437942, "dummy")
+    exists = check_exist(1201890604943332644, "dummy")
     print("exists?", exists)
