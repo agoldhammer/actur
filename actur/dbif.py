@@ -8,16 +8,34 @@ def init_db(host: str):
     _host = host
 
 
-def save_article_fn():
+def db_setup():
     global _host
     _client = pymongo.MongoClient(_host)
+    _client.actur.articles.create_index("hash")
 
     def save_article(entry):
         _client.actur.articles.insert_one(entry)
 
-    return save_article
+    def is_summary_in_db(hash, summary):
+        print("checking hash", hash)
+        articles_with_hash = _client.actur.articles.find({"hash": hash})
+        # articles_with_hash = _client.actur.articles.find()
+        for article in articles_with_hash:
+            print("dup hash found", article["hash"], article["_id"])
+            if article["summary"] == summary:
+                print("dup article found with hash", hash)
+                return True
+            else:
+                print("text differs")
+                continue
+        return False
+
+    return save_article, is_summary_in_db
 
 
 if __name__ == "__main__":
     init_db("mongodb://elite.local")
-    print(_host)
+    save_art, check_exist = db_setup()
+    exists = check_exist(8526757651552039682, "dummy")
+    exists = check_exist(7822652997085437942, "dummy")
+    print("exists?", exists)

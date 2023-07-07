@@ -36,6 +36,9 @@ add_new_hash, view_duped_hashes = check_hash()
 
 
 def process_feed(feed: feeds.Feed):
+    n_processed = 0
+    n_skipped = 0
+    n_saved = 0
     feedname = feed.name
     url = feed.url
     print("Feed:", feedname)
@@ -45,8 +48,9 @@ def process_feed(feed: feeds.Feed):
     print("bozo/status", d.bozo, d.status)
     # print("d keys", d.keys())
     print("no. entries", len(d.entries))
-    save_article = dbif.save_article_fn()
+    save_article, is_summary_in_db = dbif.db_setup()
     for entry in d.entries:
+        n_processed += 1
         # pprint.pprint(entry)
 
         # print("type:", type(entry))
@@ -76,9 +80,16 @@ def process_feed(feed: feeds.Feed):
         print("ENTRY:---------->")
         # pprint.pprint(entry)
         # # save to database
-        save_article(entry)
-        print("entry saved")
+        already_in = is_summary_in_db(ehash, entry.summary)
+        if already_in:
+            print("skipping")
+            n_skipped += 1
+        else:
+            save_article(entry)
+            n_saved += 1
+            print("entry saved")
         print("END ENTRY----------------\n")
+    print(f"Processed: {n_processed}, Saved: {n_saved}, Skipped: {n_skipped}")
 
 
 def parse_pub(pub: feeds.Publication):
