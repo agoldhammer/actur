@@ -6,6 +6,7 @@ import datetime
 import dbif
 import feedparser
 import feeds
+import hasher
 
 # import pprint
 
@@ -51,7 +52,8 @@ def process_feed(feed: feeds.Feed):
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
         print("dt", dt)
-        ehash = hash(entry.summary)
+        ehash = hasher.ag_hash(entry.summary)
+        print("ehash: ", ehash)
         entry["hash"] = ehash
         print("ENTRY:---------->")
         already_in = is_summary_in_db(ehash, entry.summary)
@@ -59,6 +61,9 @@ def process_feed(feed: feeds.Feed):
             print("skipping")
             bump_skipped()
         else:
+            # entry.pop("summary_detail")
+            # entry.pop("guidislink")
+            # entry.pop("media_credit")
             save_article(entry)
             bump_added()
             print("entry saved")

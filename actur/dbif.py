@@ -17,9 +17,9 @@ def db_setup():
         _client.actur.articles.insert_one(entry)
 
     def is_summary_in_db(target_hash, summary):
-        print("checking hash", target_hash, hash(summary))
+        print("checking hash", target_hash)
         articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
-        print("found:", len(list(articles_with_target_hash)))
+        # print("found:", len(list(articles_with_target_hash)))
         articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
         # articles_with_hash = _client.actur.articles.find()
         for article in articles_with_target_hash:
