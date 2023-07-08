@@ -12,6 +12,10 @@ def db_setup():
     global _host
     _client = pymongo.MongoClient(_host)
     _client.actur.articles.create_index("hash")
+    _client.actur.articles.create_index(
+        [("pubdate", pymongo.DESCENDING)], background=True
+    )
+    _client.actur.articles.create_index([("summary", pymongo.TEXT)], background=True)
 
     def save_article(entry):
         _client.actur.articles.insert_one(entry)

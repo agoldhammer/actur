@@ -76,6 +76,7 @@ def parse_pub(pub: feeds.Publication):
     print("**********")
     for feed in pub.feeds:
         process_feed(feed)
+    print(f"Done with pub {pub.name}\n")
 
 
 def process_pubs():
