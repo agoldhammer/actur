@@ -48,17 +48,17 @@ def process_feed(feed: feeds.Feed):
     save_article, is_summary_in_db = dbif.db_setup()
     for entry in d.entries:
         bump_processed()
-        print("keys:", entry.keys())
+        # print("keys:", entry.keys())
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
-        print("dt", dt)
+        # print("dt", dt)
         ehash = hasher.ag_hash(entry.summary)
-        print("ehash: ", ehash)
+        # print("ehash: ", ehash)
         entry["hash"] = ehash
-        print("ENTRY:---------->")
+        # print("ENTRY:---------->")
         already_in = is_summary_in_db(ehash, entry.summary)
         if already_in:
-            print("skipping")
+            # print("skipping")
             bump_skipped()
         else:
             # entry.pop("summary_detail")
@@ -66,8 +66,8 @@ def process_feed(feed: feeds.Feed):
             # entry.pop("media_credit")
             save_article(entry)
             bump_added()
-            print("entry saved")
-        print("END ENTRY----------------\n")
+            # print("entry saved")
+        # print("END ENTRY----------------\n")
     print(get_counts())
 
 
