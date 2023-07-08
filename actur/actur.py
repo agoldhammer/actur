@@ -45,7 +45,7 @@ def process_feed(feed: feeds.Feed):
     print("bozo/status", d.bozo, d.status)
     # print("d keys", d.keys())
     print("no. entries", len(d.entries))
-    save_article, is_summary_in_db = dbif.db_setup()
+    # save_article, is_summary_in_db = dbif.db_setup()
     for entry in d.entries:
         bump_processed()
         # print("keys:", entry.keys())
@@ -56,7 +56,7 @@ def process_feed(feed: feeds.Feed):
         # print("ehash: ", ehash)
         entry["hash"] = ehash
         # print("ENTRY:---------->")
-        already_in = is_summary_in_db(ehash, entry.summary)
+        already_in = dbif.is_summary_in_db(ehash, entry.summary)
         if already_in:
             # print("skipping")
             bump_skipped()
@@ -64,7 +64,7 @@ def process_feed(feed: feeds.Feed):
             # entry.pop("summary_detail")
             # entry.pop("guidislink")
             # entry.pop("media_credit")
-            save_article(entry)
+            dbif.save_article(entry)
             bump_added()
             # print("entry saved")
         # print("END ENTRY----------------\n")
