@@ -20,7 +20,7 @@ def init_db(host: str, dbname: str = "actur"):
     db.articles.create_index("hash")
     db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
     db.articles.create_index([("summary", pymongo.TEXT)], background=True)
-    db.articles.create_index("pubname")
+    db.articles.create_index("pubname", background=True)
 
 
 def save_article(entry):
@@ -72,6 +72,11 @@ if __name__ == "__main__":
         print(article)
     start = pendulum.yesterday()
     end = pendulum.today()
+    cursor = find_articles_by_daterange(start, end)
+    for article in cursor:
+        print(article)
+    start = pendulum.today()
+    end = pendulum.tomorrow()
     cursor = find_articles_by_daterange(start, end)
     for article in cursor:
         print(article)
