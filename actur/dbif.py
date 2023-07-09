@@ -58,7 +58,8 @@ def find_articles_by_pubname(pubname: str):
 def find_articles_by_daterange(start, end):
     db = get_db()
     return db.articles.find(
-        {"pubdate": {"$gte": start, "$lte": end}}, {"pubdate": 1, "pubname": 1}
+        {"pubdate": {"$gte": start, "$lte": end}},
+        {"pubdate": 1, "pubname": 1, "summary": 1, "title": 1},
     )
 
 
@@ -77,6 +78,13 @@ if __name__ == "__main__":
         print(article)
     start = pendulum.today()
     end = pendulum.tomorrow()
-    cursor = find_articles_by_daterange(start, end)
+    # cursor = find_articles_by_daterange(start, end)
+    # for article in cursor:
+    #     print(article)
+    print("\nsorting")
+    cursor = find_articles_by_daterange(start, end).sort(
+        [("pubname", 1), ("pubdate", 1)]
+    )
     for article in cursor:
-        print(article)
+        print(f"{article['pubname']}: {article['pubdate']}")
+        print(article["title"])
