@@ -1,0 +1,2 @@
+add pub name to stored article
+add search by date
