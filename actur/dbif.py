@@ -1,3 +1,4 @@
+import pendulum
 import pymongo
 
 _host: str = ""
@@ -28,11 +29,9 @@ def save_article(entry):
 
 
 def is_summary_in_db(target_hash, summary):
-    global _client
+    db = get_db()
     # print("checking hash", target_hash)
-    articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
-    # print("found:", len(list(articles_with_target_hash)))
-    articles_with_target_hash = _client.actur.articles.find({"hash": target_hash})
+    articles_with_target_hash = db.articles.find({"hash": target_hash})
     # articles_with_hash = _client.actur.articles.find()
     for article in articles_with_target_hash:
         # print("dup hash found", article["hash"], article["_id"])
@@ -47,12 +46,32 @@ def is_summary_in_db(target_hash, summary):
 
 
 def find_text(search_text: str):
-    global _client
-    return _client.actur.articles.find({"$text": {"$search": search_text}})
+    db = get_db()
+    return db.articles.find({"$text": {"$search": search_text}})
+
+
+def find_articles_by_pubname(pubname: str):
+    db = get_db()
+    return db.articles.find({"pubname": pubname}, {"pubdate": 1})
+
+
+def find_articles_by_daterange(start, end):
+    db = get_db()
+    return db.articles.find(
+        {"pubdate": {"$gte": start, "$lte": end}}, {"pubdate": 1, "pubname": 1}
+    )
 
 
 if __name__ == "__main__":
     init_db("mongodb://elite.local")
     cursor = find_text("émeute")
+    for article in cursor:
+        print(article)
+    cursor = find_articles_by_pubname("SZ")
+    for article in cursor:
+        print(article)
+    start = pendulum.yesterday()
+    end = pendulum.today()
+    cursor = find_articles_by_daterange(start, end)
     for article in cursor:
         print(article)
