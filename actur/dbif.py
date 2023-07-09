@@ -2,23 +2,29 @@ import pymongo
 
 _host: str = ""
 _client: pymongo.MongoClient
+_dbname: str = ""
 
 
-def init_db(host: str):
-    global _host, _client
+def get_db():
+    global _client, _dbname
+    return _client[_dbname]
+
+
+def init_db(host: str, dbname: str = "actur"):
+    global _host, _client, _dbname
     _host = host
+    _dbname = dbname
     _client = pymongo.MongoClient(_host)
-    _client.actur.articles.create_index("hash")
-    _client.actur.articles.create_index(
-        [("pubdate", pymongo.DESCENDING)], background=True
-    )
-    _client.actur.articles.create_index([("summary", pymongo.TEXT)], background=True)
-    _client.actur.articles.create_index("pubname")
+    db = get_db()
+    db.articles.create_index("hash")
+    db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
+    db.articles.create_index([("summary", pymongo.TEXT)], background=True)
+    db.articles.create_index("pubname")
 
 
 def save_article(entry):
-    global _client
-    _client.actur.articles.insert_one(entry)
+    db = get_db()
+    db.articles.insert_one(entry)
 
 
 def is_summary_in_db(target_hash, summary):
