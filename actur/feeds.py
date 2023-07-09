@@ -22,6 +22,15 @@ lemonde = Publication(
     ],
 )
 
+liberation = Publication(
+    name="Libération",
+    feeds=[
+        Feed(
+            "all", "https://www.liberation.fr/arc/outboundfeeds/rss-all/?outputType=xml"
+        )
+    ],
+)
+
 sz = Publication(
     name="SZ", feeds=[Feed("TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen")]
 )
@@ -31,7 +40,7 @@ corriere = Publication(
     feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
 )
 
-europapers = [lemonde, sz, corriere]
+europapers = [lemonde, sz, corriere, liberation]
 
 
 def get_papers() -> List[Publication]:

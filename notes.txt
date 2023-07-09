@@ -1,2 +1,3 @@
-add pub name to stored article
-add search by date
+DONE add pub name to stored article
+DONE search by date
+do nice display routine
