@@ -13,6 +13,7 @@ def init_db(host: str):
         [("pubdate", pymongo.DESCENDING)], background=True
     )
     _client.actur.articles.create_index([("summary", pymongo.TEXT)], background=True)
+    _client.actur.articles.create_index("pubname")
 
 
 def save_article(entry):
@@ -38,8 +39,14 @@ def is_summary_in_db(target_hash, summary):
             continue
     return False
 
-    # return save_article, is_summary_in_db
+
+def find_text(search_text: str):
+    global _client
+    return _client.actur.articles.find({"$text": {"$search": search_text}})
 
 
 if __name__ == "__main__":
     init_db("mongodb://elite.local")
+    cursor = find_text("émeute")
+    for article in cursor:
+        print(article)

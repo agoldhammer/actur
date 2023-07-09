@@ -1,14 +1,9 @@
 import datetime
 
-# import pprint
-
-# from textwrap import TextWrapper
 import dbif
 import feedparser
 import feeds
 import hasher
-
-# import pprint
 
 
 def pcounters():
@@ -34,48 +29,42 @@ def pcounters():
     return bump_processed, bump_added, bump_skipped, counts2str
 
 
-def process_feed(feed: feeds.Feed):
+def process_feed(feed: feeds.Feed, pubname: str):
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
     url = feed.url
     print("Feed:", feedname)
-    print("&&&&&&&&&&&&&&&&&")
+    print(20 * "_")
     d = feedparser.parse(url)
     print("version", d.version)
     print("bozo/status", d.bozo, d.status)
     # print("d keys", d.keys())
     print("no. entries", len(d.entries))
-    # save_article, is_summary_in_db = dbif.db_setup()
     for entry in d.entries:
         bump_processed()
-        # print("keys:", entry.keys())
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
-        # print("dt", dt)
         ehash = hasher.ag_hash(entry.summary)
-        # print("ehash: ", ehash)
         entry["hash"] = ehash
-        # print("ENTRY:---------->")
         already_in = dbif.is_summary_in_db(ehash, entry.summary)
         if already_in:
-            # print("skipping")
             bump_skipped()
         else:
-            # entry.pop("summary_detail")
-            # entry.pop("guidislink")
-            # entry.pop("media_credit")
+            entry.pop("summary_detail", "")
+            entry.pop("guidislink", "")
+            entry.pop("media_credit", "")
+            entry["pubname"] = pubname
+            entry["feedname"] = feedname
             dbif.save_article(entry)
             bump_added()
-            # print("entry saved")
-        # print("END ENTRY----------------\n")
     print(get_counts())
 
 
 def parse_pub(pub: feeds.Publication):
     print("Publication:", pub.name)
-    print("**********")
+    print(20 * "*")
     for feed in pub.feeds:
-        process_feed(feed)
+        process_feed(feed, pub.name)
     print(f"Done with pub {pub.name}\n")
 
 
