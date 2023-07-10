@@ -1,5 +1,12 @@
 # import pendulum
 
+# TODO: insert cursor into a new collection
+# db.Patients.aggregate([
+# {$project:{"patient_id":1}},
+# {$out: "NewCollection"}
+
+# ])
+
 
 def main():
     pass

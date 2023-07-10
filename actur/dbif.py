@@ -72,11 +72,11 @@ if __name__ == "__main__":
     # cursor = find_articles_by_pubname("SZ")
     # for article in cursor:
     #     print(article)
-    start = pendulum.yesterday()
-    end = pendulum.today()
-    cursor = find_articles_by_daterange(start, end)
-    for article in cursor:
-        print(article)
+    # start = pendulum.yesterday()
+    # end = pendulum.today()
+    # cursor = find_articles_by_daterange(start, end)
+    # for article in cursor:
+    #     print(article)
     start = pendulum.today()
     end = pendulum.tomorrow()
     # cursor = find_articles_by_daterange(start, end)
