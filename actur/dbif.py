@@ -1,5 +1,6 @@
 import pendulum
 import pymongo
+import display
 
 _host: str = ""
 _client: pymongo.MongoClient
@@ -65,12 +66,12 @@ def find_articles_by_daterange(start, end):
 
 if __name__ == "__main__":
     init_db("mongodb://elite.local")
-    cursor = find_text("émeute")
-    for article in cursor:
-        print(article)
-    cursor = find_articles_by_pubname("SZ")
-    for article in cursor:
-        print(article)
+    # cursor = find_text("émeute")
+    # for article in cursor:
+    #     print(article)
+    # cursor = find_articles_by_pubname("SZ")
+    # for article in cursor:
+    #     print(article)
     start = pendulum.yesterday()
     end = pendulum.today()
     cursor = find_articles_by_daterange(start, end)
@@ -83,8 +84,9 @@ if __name__ == "__main__":
     #     print(article)
     print("\nsorting")
     cursor = find_articles_by_daterange(start, end).sort(
-        [("pubname", 1), ("pubdate", 1)]
+        [("pubname", 1), ("pubdate", -1)]
     )
     for article in cursor:
-        print(f"{article['pubname']}: {article['pubdate']}")
-        print(article["title"])
+        # print(f"{article['pubname']}: {article['pubdate']}")
+        # print(article["title"])
+        display.display_article(article)
