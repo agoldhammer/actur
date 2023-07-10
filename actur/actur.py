@@ -36,7 +36,9 @@ def process_feed(feed: feeds.Feed, pubname: str):
     print("Feed:", feedname)
     print(20 * "_")
     d = feedparser.parse(url)
-    print("version", d.version)
+    # TODO: Should d.feed.title be stored instead of feed.name?
+    print("Feed title:", d.feed.title)
+    print("Version:", d.version)
     print("bozo/status", d.bozo, d.status)
     # print("d keys", d.keys())
     print("no. entries", len(d.entries))

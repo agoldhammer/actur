@@ -17,8 +17,9 @@ class Publication:
 lemonde = Publication(
     name="LeMonde",
     feeds=[
-        Feed("Une", "https://www.lemonde.fr/politique/rss_full.xml"),
-        # Feed("Politique", "https://www.lemonde.fr/politique/rss_full.xml"),
+        Feed("Politique", "https://www.lemonde.fr/politique/rss_full.xml"),
+        Feed("Une", "https://www.lemonde.fr/rss/une.xml"),
+        Feed("Idées", "https://www.lemonde.fr/idees/rss_full.xml"),
     ],
 )
 
