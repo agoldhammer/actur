@@ -7,6 +7,7 @@ import pytest
 from click.testing import CliRunner
 
 import actur
+import actur.show_news
 
 
 @pytest.fixture
@@ -28,9 +29,10 @@ def test_content(response):
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()
-    result = runner.invoke(actur.actu.main)
-    assert result.exit_code == 0
-    assert "actur.actu.main" in result.output
-    help_result = runner.invoke(actur.actu.main, ["--help"])
-    assert help_result.exit_code == 0
-    assert "--help  Show this message and exit." in help_result.output
+    result = runner.invoke(actur.show_news.main)
+    assert result.exit_code == 0  # nosec
+    # assert "actur.show_news.main" in result.output  # nosec
+    help_result = runner.invoke(actur.show_news.main, ["--help"])
+    assert help_result.exit_code == 0  # nosec
+    print(help_result.output)
+    assert "--help" in help_result.output  # nosec

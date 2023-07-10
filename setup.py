@@ -21,7 +21,7 @@ test_requirements = [
 setup(
     author="Art Goldhammer",
     author_email="art.goldhammer@gmail.com",
-    python_requires=">=3.6",
+    python_requires=">=3.11",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -35,7 +35,7 @@ setup(
     description="news reader using RSS feeds",
     entry_points={
         "console_scripts": [
-            "actu=actur.actu:main",
+            "shownews=actur.show_news:main",
         ],
     },
     install_requires=requirements,
