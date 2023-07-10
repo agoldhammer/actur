@@ -40,7 +40,6 @@ def process_feed(feed: feeds.Feed, pubname: str):
     print("Feed title:", d.feed.title)
     print("Version:", d.version)
     print("bozo/status", d.bozo, d.status)
-    # print("d keys", d.keys())
     print("no. entries", len(d.entries))
     for entry in d.entries:
         bump_processed()
@@ -63,11 +62,12 @@ def process_feed(feed: feeds.Feed, pubname: str):
 
 
 def parse_pub(pub: feeds.Publication):
-    print("Publication:", pub.name)
+    print("\nPublication:", pub.name)
     print(20 * "*")
     for feed in pub.feeds:
         process_feed(feed, pub.name)
     print(f"Done with pub {pub.name}\n")
+    print(20 * "*")
 
 
 def process_pubs():

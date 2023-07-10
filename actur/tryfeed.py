@@ -7,7 +7,9 @@ import sys
 
 def main(url: str):
     d = feedparser.parse(url)
-    print(f"Feed title: {d.feed.title}")
+    print("feed keys", d.feed.keys())
+    if "title" in d.feed:
+        print(f"Feed title: {d.feed.title}")
     for entry in d.entries:
         pprint.pprint(entry)
 
