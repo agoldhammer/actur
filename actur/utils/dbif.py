@@ -1,6 +1,6 @@
 import pendulum
 import pymongo
-import display
+from . import display
 
 _host: str = ""
 _client: pymongo.MongoClient

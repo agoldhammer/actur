@@ -1,4 +1,4 @@
-from actur import dbif
+from . import dbif
 import pendulum
 
 

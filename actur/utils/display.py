@@ -1,5 +1,5 @@
 import textwrap
-from summary_parser import summary_parse
+from .summary_parser import summary_parse
 
 
 def display_article(article):

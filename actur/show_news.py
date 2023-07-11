@@ -1,7 +1,8 @@
 """Console script for actur."""
 import sys
 import click
-from actur import dbif, query
+from actur.utils import query
+from actur.utils import dbif
 
 
 @click.command()

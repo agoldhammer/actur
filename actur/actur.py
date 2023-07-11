@@ -1,9 +1,9 @@
 import datetime
 
-import dbif
+from utils import dbif
 import feedparser
 import feeds
-import hasher
+from utils import hasher
 
 
 def pcounters():
