@@ -21,10 +21,15 @@ def main(pubname: str, start: str, end: str, summ: bool, days: int, hours: int):
         print(days, hours)
         query.create_temp_daterange(days, hours)
         db = dbif.get_db()
-        if pubname is not None:
-            articles = db.daterange.find({"pubname": pubname[0]})
-            for article in articles:
-                display.display_article(article)
+        # pubname is a list, since it may be specified multiple times
+        # on command line
+        if "all" in pubname:
+            print("want to output all pubs")
+        else:
+            articles = db.daterange.find({"pubname": {"$in": pubname}}).sort(
+                "pubdate", 1
+            )
+            display.display_articles(articles)
 
     return 0
 

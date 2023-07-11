@@ -25,3 +25,8 @@ def display_article(article):
         )
         print(src)
     print(20 * "-")
+
+
+def display_articles(cursor):
+    for article in cursor:
+        display_article(article)
