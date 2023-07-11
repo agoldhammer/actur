@@ -2,7 +2,7 @@ import datetime
 
 from utils import dbif
 import feedparser
-import feeds
+from utils import feeds
 from utils import hasher
 
 
