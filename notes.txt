@@ -1,3 +1,7 @@
 DONE add pub name to stored article
 DONE search by date
-do nice display routine
+DONE do nice display routine
+
+explore: textualize, trogon for ui
+
+

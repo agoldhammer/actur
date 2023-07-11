@@ -64,6 +64,19 @@ def find_articles_by_daterange(start, end):
     )
 
 
+def make_tempdb_from_daterange(start, end):
+    db = get_db()
+    pipeline = [
+        {"$match": {"pubdate": {"$gte": start, "$lte": end}}},
+        {"$out": "daterange"},
+    ]
+    db.articles.aggregate(pipeline)
+
+
+def today_range():
+    return pendulum.today(), pendulum.tomorrow()
+
+
 if __name__ == "__main__":
     init_db("mongodb://elite.local")
     # cursor = find_text("émeute")
