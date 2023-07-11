@@ -1,2 +1,7 @@
-add pub name to stored article
-add search by date
+DONE add pub name to stored article
+DONE search by date
+DONE do nice display routine
+
+explore: textualize, trogon for ui
+
+

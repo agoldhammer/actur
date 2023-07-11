@@ -1,5 +1,6 @@
 import pendulum
 import pymongo
+from . import display
 
 _host: str = ""
 _client: pymongo.MongoClient
@@ -63,28 +64,31 @@ def find_articles_by_daterange(start, end):
     )
 
 
-if __name__ == "__main__":
+def make_tempdb_from_daterange(start, end):
+    db = get_db()
+    pipeline = [
+        {"$match": {"pubdate": {"$gte": start, "$lte": end}}},
+        {"$out": "daterange"},
+    ]
+    db.articles.aggregate(pipeline)
+
+
+def today_range():
+    return pendulum.today(), pendulum.tomorrow()
+
+
+# ! For testing only!!
+def view_past_day():
     init_db("mongodb://elite.local")
-    cursor = find_text("émeute")
-    for article in cursor:
-        print(article)
-    cursor = find_articles_by_pubname("SZ")
-    for article in cursor:
-        print(article)
-    start = pendulum.yesterday()
-    end = pendulum.today()
-    cursor = find_articles_by_daterange(start, end)
-    for article in cursor:
-        print(article)
+
     start = pendulum.today()
     end = pendulum.tomorrow()
-    # cursor = find_articles_by_daterange(start, end)
-    # for article in cursor:
-    #     print(article)
+
     print("\nsorting")
     cursor = find_articles_by_daterange(start, end).sort(
-        [("pubname", 1), ("pubdate", 1)]
+        [("pubname", 1), ("pubdate", -1)]
     )
     for article in cursor:
-        print(f"{article['pubname']}: {article['pubdate']}")
-        print(article["title"])
+        # print(f"{article['pubname']}: {article['pubdate']}")
+        # print(article["title"])
+        display.display_article(article)
