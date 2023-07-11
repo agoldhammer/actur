@@ -1,6 +1,8 @@
 """Console script for actur."""
 import sys
+
 import click
+
 from actur.utils import dbif, display, query
 
 
