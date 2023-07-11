@@ -27,6 +27,6 @@ def main():
 
 
 if __name__ == "__main__":
-    dbif.init_db("mongodb://elite.local")
+    dbif.init_db()
     create_temp_daterange(days=1, hours=None)
     main()

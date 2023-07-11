@@ -74,7 +74,7 @@ def process_pubs():
 
 
 def main():
-    dbif.init_db("mongodb://elite.local")
+    dbif.init_db()
     process_pubs()
 
 

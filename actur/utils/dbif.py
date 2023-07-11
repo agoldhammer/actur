@@ -5,6 +5,7 @@ from . import display
 _host: str = ""
 _client: pymongo.MongoClient
 _dbname: str = ""
+_default_dbname = "mongodb://192.168.0.128"
 
 
 def get_db():
@@ -12,7 +13,7 @@ def get_db():
     return _client[_dbname]
 
 
-def init_db(host: str, dbname: str = "actur"):
+def init_db(host: str = _default_dbname, dbname: str = "actur"):
     global _host, _client, _dbname
     _host = host
     _dbname = dbname
@@ -79,7 +80,7 @@ def today_range():
 
 # ! For testing only!!
 def view_past_day():
-    init_db("mongodb://elite.local")
+    init_db()
 
     start = pendulum.today()
     end = pendulum.tomorrow()

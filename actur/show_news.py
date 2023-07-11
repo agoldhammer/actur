@@ -15,7 +15,7 @@ from actur.utils import dbif, display, feeds, query
 @click.option("--summ/--no-summ", default=True)
 def main(pubname: list[str], start: str, end: str, summ: bool, days: int, hours: int):
     """Console script for actur."""
-    dbif.init_db("mongodb://elite.local")
+    dbif.init_db()
     if days is not None or hours is not None:
         print("creating temp dr")
         print(days, hours)
