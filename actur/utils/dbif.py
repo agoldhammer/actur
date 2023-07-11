@@ -77,24 +77,13 @@ def today_range():
     return pendulum.today(), pendulum.tomorrow()
 
 
-if __name__ == "__main__":
+# ! For testing only!!
+def view_past_day():
     init_db("mongodb://elite.local")
-    # cursor = find_text("émeute")
-    # for article in cursor:
-    #     print(article)
-    # cursor = find_articles_by_pubname("SZ")
-    # for article in cursor:
-    #     print(article)
-    # start = pendulum.yesterday()
-    # end = pendulum.today()
-    # cursor = find_articles_by_daterange(start, end)
-    # for article in cursor:
-    #     print(article)
+
     start = pendulum.today()
     end = pendulum.tomorrow()
-    # cursor = find_articles_by_daterange(start, end)
-    # for article in cursor:
-    #     print(article)
+
     print("\nsorting")
     cursor = find_articles_by_daterange(start, end).sort(
         [("pubname", 1), ("pubdate", -1)]

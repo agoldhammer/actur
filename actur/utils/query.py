@@ -2,18 +2,18 @@ from . import dbif
 import pendulum
 
 
-def create_temp_daterange(days: str | None, hours: str | None):
+def create_temp_daterange(days: int | None, hours: int | None):
     now = pendulum.now().in_timezone("UTC")
     past = now
     if days is not None:
-        past = past.subtract(days=int(days))
+        past = past.subtract(days=days)
     if hours is not None:
-        past = past.subtract(hours=int(hours))
+        past = past.subtract(hours=hours)
     print("start, end:", past, now)
     dbif.make_tempdb_from_daterange(past, now)
-    db = dbif.get_db()
-    for art in db.daterange.find({}, {"pubdate": 1}):
-        print(art)
+    # db = dbif.get_db()
+    # for art in db.daterange.find({}, {"pubdate": 1}):
+    #     print(art)
 
 
 def main():
@@ -28,5 +28,5 @@ def main():
 
 if __name__ == "__main__":
     dbif.init_db("mongodb://elite.local")
-    create_temp_daterange(days="1", hours=None)
+    create_temp_daterange(days=1, hours=None)
     main()
