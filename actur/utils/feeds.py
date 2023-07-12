@@ -37,7 +37,7 @@ sz = Publication(
 )
 
 corriere = Publication(
-    name="Corriere della Sera",
+    name="Corriere",
     feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
 )
 
@@ -58,7 +58,7 @@ handelsblatt = Publication(
 faz = Publication(name="FAZ", feeds=[Feed("FAZ - all", "https://faz.net/rss/aktuel")])
 
 echos = Publication(
-    name="Les Echos",
+    name="LesEchos",
     feeds=[
         Feed("Echos - Idées", "https://services.lesechos.fr/rss/les-echos-idees.xml"),
         Feed(

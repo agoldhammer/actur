@@ -24,6 +24,7 @@ def display_article(article):
             subsequent_indent=7 * " ",
         )
         print(src)
+    print(f"\n{Fore.LIGHTMAGENTA_EX}{article['link']}{Style.RESET_ALL}\n")
     print(20 * "-")
 
 
