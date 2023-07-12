@@ -1,7 +1,7 @@
 import datetime
 
 import feedparser
-from utils import dbif, feeds, hasher
+from actur.utils import dbif, feeds, hasher
 
 
 def pcounters():
