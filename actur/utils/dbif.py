@@ -106,4 +106,4 @@ def view_past_day():
     for article in cursor:
         # print(f"{article['pubname']}: {article['pubdate']}")
         # print(article["title"])
-        display.display_article(article)
+        display.display_article(article, summary_flag=True)

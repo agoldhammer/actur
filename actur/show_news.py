@@ -12,15 +12,15 @@ from actur.utils import dbif, display, feeds, query
 @click.option("--end", "-e", help="end date")
 @click.option("--days", "-d", type=int, help="days ago")
 @click.option("--hours", "-h", type=int, help="hours ago")
-@click.option("--summ/--no-summ", default=True)
+@click.option("--summary", is_flag=True, help="Display summaries")
 @click.option("--list", is_flag=True, help="List publications")
 @click.argument("pubnames", nargs=-1)
 def main(
     list: bool,
+    summary: bool,
     pubnames: list[str],
     start: str,
     end: str,
-    summ: bool,
     days: int,
     hours: int,
 ):
@@ -41,7 +41,7 @@ def main(
         if "all" in pubnames:
             pubnames = [pub.name for pub in feeds.get_papers()]
         articles = dbif.get_articles_in_daterange(pubnames)
-        display.display_articles(articles)
+        display.display_articles(articles, summary_flag=summary)
 
     return 0
 
