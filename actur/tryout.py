@@ -1,8 +1,8 @@
-from utils import dbif
+import actur.config.readconf as rc
 
 
 def main():
-    dbif.view_past_day()
+    rc.read_conf()
 
 
 if __name__ == "__main__":
