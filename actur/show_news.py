@@ -31,6 +31,9 @@ def main(
         for pub in pubs:
             print(pub)
         return 0
+    if (start or end) and (days or hours):
+        print("Error: Cannot specify explicit start or end with days or hours option")
+        return 0
     dbif.init_db()
     if days is not None or hours is not None:
         print("creating temp dr")
