@@ -13,9 +13,24 @@ from actur.utils import dbif, display, feeds, query
 @click.option("--days", "-d", type=int, help="days ago")
 @click.option("--hours", "-h", type=int, help="hours ago")
 @click.option("--summ/--no-summ", default=True)
+@click.option("--list", is_flag=True, help="List publications")
 @click.argument("pubnames", nargs=-1)
-def main(pubnames: list[str], start: str, end: str, summ: bool, days: int, hours: int):
+def main(
+    list: bool,
+    pubnames: list[str],
+    start: str,
+    end: str,
+    summ: bool,
+    days: int,
+    hours: int,
+):
     """Console script for actur."""
+    if list:
+        pubs = feeds.get_papers()
+        print("Feeds:\n----\n")
+        for pub in pubs:
+            print(pub)
+        return 0
     dbif.init_db()
     if days is not None or hours is not None:
         print("creating temp dr")

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import List
+
+# from actur.config import readconf
 
 
 @dataclass
@@ -11,7 +12,19 @@ class Feed:
 @dataclass
 class Publication:
     name: str
-    feeds: List[Feed]
+    feeds: list[Feed]
+
+
+def make_feed(name, url) -> Feed:
+    return Feed(name, url)
+
+
+# def set_pubs_from_conf():
+#     rawpubs = readconf.read_conf()
+#     for rawpub in rawpubs:
+#         feeds = [make_feed(*feed) for feed in rawpub["feeds"]]
+#         # pub = Publication(rawpub["name"], feeds)
+#     return feeds
 
 
 lemonde = Publication(
@@ -84,5 +97,5 @@ https://services.lesechos.fr/rss/les-echos-finance-marches.xml
 europapers = [lemonde, sz, corriere, liberation, zeit, handelsblatt, echos]
 
 
-def get_papers() -> List[Publication]:
+def get_papers() -> list[Publication]:
     return europapers
