@@ -1,11 +1,12 @@
 import pendulum
 import pymongo
 from . import display
+from ..config import readconf as rc
 
-_host: str = ""
+_host: str | None = None
 _client: pymongo.MongoClient
 _dbname: str = ""
-_default_dbname = "mongodb://192.168.0.128"
+# _default_host = "mongodb://192.168.0.128"
 
 
 class ActuDBError(Exception):
@@ -22,11 +23,14 @@ def get_db():
     return _client[_dbname]
 
 
-def init_db(host: str = _default_dbname, dbname: str = "actur"):
+def init_db():
     global _host, _client, _dbname
-    _host = host
-    _dbname = dbname
-    _client = pymongo.MongoClient(_host)
+    if _host is None:  # not yet initialized, so read conf
+        rc.read_conf()
+        database = rc.get_conf_by_key("database")
+        _host = database["url"]
+        _dbname = database["dbname"]
+        _client = pymongo.MongoClient(_host)
     db = get_db()
     db.articles.create_index("hash")
     db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)

@@ -1,6 +1,11 @@
 
+[database]
+url = "mongodb://192.168.0.128:27017"
+dbname = "actur"
+
 [[Publications]]
 name = "LeMonde"
+group = "French"
 feeds = [
     [
         "Politique",
@@ -18,6 +23,7 @@ feeds = [
 
 [[Publications]]
 name = "Libération"
+group = "French"
 feeds = [
     [
         "all",
@@ -27,18 +33,22 @@ feeds = [
 
 [[Publications]]
 name = "SZ"
+group = "German"
 feeds = [["TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen"]]
 
 [[Publications]]
 name = "Corriere"
+group = "Italian"
 feeds = [["all", "http://xml2.corriereobjects.it/rss/homepage.xml"]]
 
 [[Publications]]
 name = "Zeit"
+group = "German"
 feeds = [["Zeit - all", "https://newsfeed.zeit.de/index"]]
 
 [[Publications]]
 name = "Handelsblatt"
+group = "German"
 feeds = [
     [
         "Handelsblatt - all",
@@ -46,12 +56,13 @@ feeds = [
     ],
 ]
 
-[[Publications]]
-name = "FAZ"
-feeds = [["FAZ - all", "https://faz.net/rss/aktuel"]]
+# [[Publications]]
+# name = "FAZ"
+# feeds = [["FAZ - all", "https://faz.net/rss/aktuel"]]
 
 [[Publications]]
 name = "LesEchos"
+group = "French"
 feeds = [
     [
         "Echos - Idées",
@@ -66,3 +77,24 @@ feeds = [
         "https://services.lesechos.fr/rss/les-echos-finance-marches.xml",
     ],
 ]
+
+# ! Template
+# [[Publications]]
+# name = 
+# group = 
+# feeds = [
+#     [
+#         "feedname1",
+#         "https://feedname1.url",
+#     ],
+#     [
+#         "feedname2",
+#         "https://feedname2.url",
+#     ],
+#     [
+#         "feedname3",
+#         "https://feedname3.url",
+#     ],
+# ]
+
+
