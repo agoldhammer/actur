@@ -1,7 +1,7 @@
 import datetime
 
 import feedparser
-from utils import dbif, feeds, hasher
+from actur.utils import dbif, feeds, hasher
 
 
 def pcounters():
@@ -35,7 +35,8 @@ def process_feed(feed: feeds.Feed, pubname: str):
     print(20 * "_")
     d = feedparser.parse(url)
     # TODO: Should d.feed.title be stored instead of feed.name?
-    print("Feed title:", d.feed.title)
+    # ! Some feeds seem to have no attr title
+    # print("Feed title:", d.feed.title)
     print("Version:", d.version)
     print("bozo/status", d.bozo, d.status)
     print("no. entries", len(d.entries))

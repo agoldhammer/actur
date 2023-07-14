@@ -8,8 +8,17 @@ _dbname: str = ""
 _default_dbname = "mongodb://192.168.0.128"
 
 
+class ActuDBError(Exception):
+    def __init__(self, value):
+        self.value = value
+        super().__init__(value)
+
+
 def get_db():
     global _client, _dbname
+    # sanity check
+    if _dbname == "":
+        raise ActuDBError("DB name not defined. Must call init_db first.")
     return _client[_dbname]
 
 
@@ -78,6 +87,11 @@ def today_range():
     return pendulum.today(), pendulum.tomorrow()
 
 
+def get_articles_in_daterange(pubnames: list[str]):
+    db = get_db()
+    return db.daterange.find({"pubname": {"$in": pubnames}}).sort("pubdate", 1)
+
+
 # ! For testing only!!
 def view_past_day():
     init_db()
@@ -92,4 +106,4 @@ def view_past_day():
     for article in cursor:
         # print(f"{article['pubname']}: {article['pubdate']}")
         # print(article["title"])
-        display.display_article(article)
+        display.display_article(article, summary_flag=True)
