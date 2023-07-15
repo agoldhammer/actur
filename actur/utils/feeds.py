@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-# from actur.config import readconf
+from actur.config import readconf as rc
 
 
 @dataclass
@@ -12,11 +12,19 @@ class Feed:
 @dataclass
 class Publication:
     name: str
+    group: str
     feeds: list[Feed]
 
 
-def make_feed(name, url) -> Feed:
-    return Feed(name, url)
+def make_feed(name_url_pair: list) -> Feed:
+    return Feed(name_url_pair[0], name_url_pair[1])
+
+
+def make_pub(name: str, group: str, rawfeeds: list):
+    feeds = []
+    for feed in rawfeeds:
+        feeds.append(make_feed(feed))
+    return Publication(name=name, group=group, feeds=feeds)
 
 
 # def set_pubs_from_conf():
@@ -27,75 +35,88 @@ def make_feed(name, url) -> Feed:
 #     return feeds
 
 
-lemonde = Publication(
-    name="LeMonde",
-    feeds=[
-        Feed("Politique", "https://www.lemonde.fr/politique/rss_full.xml"),
-        Feed("Une", "https://www.lemonde.fr/rss/une.xml"),
-        Feed("Idées", "https://www.lemonde.fr/idees/rss_full.xml"),
-    ],
-)
+# lemonde = Publication(
+#     name="LeMonde",
+#     group="French",
+#     feeds=[
+#         Feed("Politique", "https://www.lemonde.fr/politique/rss_full.xml"),
+#         Feed("Une", "https://www.lemonde.fr/rss/une.xml"),
+#         Feed("Idées", "https://www.lemonde.fr/idees/rss_full.xml"),
+#     ],
+# )
 
-liberation = Publication(
-    name="Libération",
-    feeds=[
-        Feed(
-            "all", "https://www.liberation.fr/arc/outboundfeeds/rss-all/?outputType=xml"
-        )
-    ],
-)
+# liberation = Publication(
+#     name="Libération",
+#     group="French",
+#     feeds=[
+#         Feed(
+#             "all", "https://www.liberation.fr/arc/outboundfeeds/rss-all/?outputType=xml"
+#         )
+#     ],
+# )
 
-sz = Publication(
-    name="SZ", feeds=[Feed("TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen")]
-)
+# sz = Publication(
+#     name="SZ",
+#     group="German",
+#     feeds=[Feed("TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen")],
+# )
 
-corriere = Publication(
-    name="Corriere",
-    feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
-)
+# corriere = Publication(
+#     name="Corriere",
+#     group="Italian",
+#     feeds=[Feed("all", "http://xml2.corriereobjects.it/rss/homepage.xml")],
+# )
 
-zeit = Publication(
-    name="Zeit", feeds=[Feed("Zeit - all", "https://newsfeed.zeit.de/index")]
-)
+# zeit = Publication(
+#     name="Zeit",
+#     group="German",
+#     feeds=[Feed("Zeit - all", "https://newsfeed.zeit.de/index")],
+# )
 
-handelsblatt = Publication(
-    name="Handelsblatt",
-    feeds=[
-        Feed(
-            "Handelsblatt - all",
-            "https://www.handelsblatt.com/contentexport/feed/top-themen",
-        )
-    ],
-)
+# handelsblatt = Publication(
+#     name="Handelsblatt",
+#     group="German",
+#     feeds=[
+#         Feed(
+#             "Handelsblatt - all",
+#             "https://www.handelsblatt.com/contentexport/feed/top-themen",
+#         )
+#     ],
+# )
 
-faz = Publication(name="FAZ", feeds=[Feed("FAZ - all", "https://faz.net/rss/aktuel")])
+# faz = Publication(
+#     name="FAZ", group="German", feeds=[Feed("FAZ - all", "https://faz.net/rss/aktuel")]
+# )
 
-echos = Publication(
-    name="LesEchos",
-    feeds=[
-        Feed("Echos - Idées", "https://services.lesechos.fr/rss/les-echos-idees.xml"),
-        Feed(
-            "Echos - Economie",
-            "https://services.lesechos.fr/rss/les-echos-economie.xml",
-        ),
-        Feed(
-            "Echos - Finance/Marchés",
-            "https://services.lesechos.fr/rss/les-echos-finance-marches.xml",
-        ),
-    ],
-)
-"""
-https://newsfeed.zeit.de/index
-https://faz.net/rss/aktuel FEED has no attribute title, so excluding
-https://www.handelsblatt.com/contentexport/feed/top-themen
-https://services.lesechos.fr/rss/les-echos-idees.xml
-https://services.lesechos.fr/rss/les-echos-economie.xml
-https://services.lesechos.fr/rss/les-echos-finance-marches.xml
+# echos = Publication(
+#     name="LesEchos",
+#     group="French",
+#     feeds=[
+#         Feed("Echos - Idées", "https://services.lesechos.fr/rss/les-echos-idees.xml"),
+#         Feed(
+#             "Echos - Economie",
+#             "https://services.lesechos.fr/rss/les-echos-economie.xml",
+#         ),
+#         Feed(
+#             "Echos - Finance/Marchés",
+#             "https://services.lesechos.fr/rss/les-echos-finance-marches.xml",
+#         ),
+#     ],
+# )
 
-"""
-
-europapers = [lemonde, sz, corriere, liberation, zeit, handelsblatt, echos]
+# europapers = [lemonde, sz, corriere, liberation, zeit, handelsblatt, echos]
 
 
-def get_papers() -> list[Publication]:
-    return europapers
+# def get_papers() -> list[Publication]:
+#     return europapers
+
+
+def get_publications() -> list[Publication]:
+    pubs = []
+    rawpubs = rc.get_conf_by_key("Publications")
+    for rawpub in rawpubs:
+        name = rawpub["name"]
+        group = rawpub["group"]
+        feeds = rawpub["feeds"]
+        pubs.append(make_pub(name, group, feeds))
+    return pubs

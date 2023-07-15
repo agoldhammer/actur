@@ -70,7 +70,7 @@ def parse_pub(pub: feeds.Publication):
 
 
 def process_pubs():
-    for pub in feeds.get_papers():
+    for pub in feeds.get_publications():
         parse_pub(pub)
 
 
