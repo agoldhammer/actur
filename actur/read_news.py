@@ -1,8 +1,8 @@
-from actur import actur
+from actur import reader
 
 
 def main():
-    actur.main()
+    reader.main()
 
 
 if __name__ == "__main__":
