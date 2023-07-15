@@ -25,8 +25,9 @@ def main(
     hours: int,
 ):
     """Console script for actur."""
+    dbif.init_db()
     if list:
-        pubs = feeds.get_papers()
+        pubs = feeds.get_publications()
         print("Feeds:\n----\n")
         for pub in pubs:
             print(pub)
@@ -34,7 +35,6 @@ def main(
     if (start or end) and (days or hours):
         print("Error: Cannot specify explicit start or end with days or hours option")
         return 0
-    dbif.init_db()
     if days is not None or hours is not None:
         print("creating temp dr")
         print(days, hours)
@@ -42,7 +42,7 @@ def main(
         # pubname is a list, since it may be specified multiple times
         # on command line
         if "all" in pubnames:
-            pubnames = [pub.name for pub in feeds.get_papers()]
+            pubnames = [pub.name for pub in feeds.get_publications()]
         articles = dbif.get_articles_in_daterange(pubnames)
         display.display_articles(articles, summary_flag=summary)
 
