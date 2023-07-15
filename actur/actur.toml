@@ -78,6 +78,11 @@ feeds = [
     ],
 ]
 
+[[Publications]]
+name = "Guardian"
+group = "British"
+feeds = [["TopStories", "https://theguardian.com/uk/rss"]]
+
 # ! Template
 # [[Publications]]
 # name = 
@@ -96,5 +101,3 @@ feeds = [
 #         "https://feedname3.url",
 #     ],
 # ]
-
-
