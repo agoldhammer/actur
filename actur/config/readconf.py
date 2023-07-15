@@ -2,7 +2,7 @@ import os
 import tomllib
 from typing import Any
 
-_conf_file_name = "actur.toml"
+_conf_file_name = "~/Prog/actur/actur/actur.toml"
 
 _conf: None | dict[str, Any] = None
 
@@ -14,7 +14,7 @@ def read_conf() -> None:
     if conf_from_env is not None:
         conf_file_name = os.path.expanduser(conf_from_env)
     else:  # use default if no spec in env
-        conf_file_name = _conf_file_name
+        conf_file_name = os.path.expanduser(_conf_file_name)
     with open(conf_file_name, "rb") as fp:
         _conf = tomllib.load(fp)
 
