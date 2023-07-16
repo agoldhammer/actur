@@ -34,8 +34,8 @@ def process_feed(feed: feeds.Feed, pubname: str):
     print("Feed:", feedname)
     print(20 * "_")
     d = feedparser.parse(url)
-    # TODO: Should d.feed.title be stored instead of feed.name?
-    # ! Some feeds seem to have no attr title
+    # !: Should d.feed.title be stored instead of feed.name?
+    # ! NO, b/c Some feeds seem to have no attr title
     # print("Feed title:", d.feed.title)
     print("Version:", d.version)
     print("bozo/status", d.bozo, d.status)
