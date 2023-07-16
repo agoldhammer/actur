@@ -1,3 +1,4 @@
 [bandit]
 exclude = tests
 tests = B101
+
