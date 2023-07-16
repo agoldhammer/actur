@@ -5,7 +5,7 @@ dbname = "actur"
 
 [[Publications]]
 name = "LeMonde"
-group = "French"
+group = "France"
 feeds = [
     [
         "Politique",
@@ -23,7 +23,7 @@ feeds = [
 
 [[Publications]]
 name = "Libération"
-group = "French"
+group = "France"
 feeds = [
     [
         "all",
@@ -33,22 +33,22 @@ feeds = [
 
 [[Publications]]
 name = "SZ"
-group = "German"
+group = "Germany"
 feeds = [["TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen"]]
 
 [[Publications]]
 name = "Corriere"
-group = "Italian"
+group = "Italy"
 feeds = [["all", "http://xml2.corriereobjects.it/rss/homepage.xml"]]
 
 [[Publications]]
 name = "Zeit"
-group = "German"
+group = "Germany"
 feeds = [["Zeit - all", "https://newsfeed.zeit.de/index"]]
 
 [[Publications]]
 name = "Handelsblatt"
-group = "German"
+group = "Germany"
 feeds = [
     [
         "Handelsblatt - all",
@@ -62,7 +62,7 @@ feeds = [
 
 [[Publications]]
 name = "LesEchos"
-group = "French"
+group = "France"
 feeds = [
     [
         "Echos - Idées",
@@ -80,8 +80,54 @@ feeds = [
 
 [[Publications]]
 name = "Guardian"
-group = "British"
+group = "UK"
 feeds = [["TopStories", "https://theguardian.com/uk/rss"]]
+
+[[Publications]]
+name = "NYTimes"
+group = "US"
+feeds = [
+    [
+        "Homepage",
+        "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    ],
+]
+
+[[Publications]]
+name = "Wapo"
+group = "US"
+feeds = [
+    [
+        "World",
+        "https://feeds.washingtonpost.com/rss/world?itid=lk_inline_manual_36",
+    ],
+    [
+        "National",
+        "https://feeds.washingtonpost.com/rss/national?itid=lk_inline_manual_32",
+    ],
+    [
+        "Opinion",
+        "https://www.washingtonpost.com/arcio/rss/category/opinions/?itid=lk_inline_manual_7",
+    ],
+]
+
+[[Publications]]
+name = "WSJ"
+group = "US"
+feeds = [
+    [
+        "World",
+        "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+    ],
+    [
+        "Opinion",
+        "https://feeds.a.dj.com/rss/RSSOpinion.xml",
+    ],
+    [
+        "feedname3",
+        "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+    ],
+]
 
 # ! Template
 # [[Publications]]

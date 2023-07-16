@@ -8,25 +8,9 @@ NB: db_init reads the conf file and inits database
 
 TODO:
 
-add more feeds
+DONE add more feeds
 query by group
 add start, end to show news (not yet implemented)
 
-Times:
-homepage https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
 
-Post
-World:
-https://feeds.washingtonpost.com/rss/world?itid=lk_inline_manual_36
-National:
-https://feeds.washingtonpost.com/rss/national?itid=lk_inline_manual_32
-Opinions:
-https://www.washingtonpost.com/arcio/rss/category/opinions/?itid=lk_inline_manual_7
-
-WSJ
-World: https://feeds.a.dj.com/rss/RSSWorldNews.xml
-Opiniions: 
-https://feeds.a.dj.com/rss/RSSOpinion.xml
-Tech:
-https://feeds.a.dj.com/rss/RSSWSJD.xml
 
