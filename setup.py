@@ -36,7 +36,7 @@ setup(
     entry_points={
         "console_scripts": [
             "shownews=actur.show_news:main",
-            "readnews=actur.read_news:main",
+            "readnews=actur.reader:main",
             "tryout=actur.tryout:main",
         ],
     },
