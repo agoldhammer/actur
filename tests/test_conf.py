@@ -1,5 +1,6 @@
 from actur.config import readconf
 from actur.utils import dbif, feeds
+import feedparser
 
 import pytest
 
@@ -23,3 +24,17 @@ def test_config_and_feedparsing():
     pubs = feeds.get_publications()
     names = [pub.name for pub in pubs]
     assert "SZ" in names  # nosec
+
+
+# ensure that every configured feed can read its url
+def test_feeds():
+    pubs = feeds.get_publications()
+    for pub in pubs:
+        print("connecting to pub.name")
+        for feed in pub.feeds:
+            print(f"connecting to feed {feed.name}")
+            d = feedparser.parse(feed.url)
+            assert d is not None  # nosec
+            assert d.entries is not None  # nosec
+            for entry in d.entries:
+                assert entry.published is not None  # nosec
