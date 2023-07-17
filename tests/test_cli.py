@@ -2,8 +2,6 @@
 
 """Tests for `actur` package."""
 
-import pytest
-
 from click.testing import CliRunner
 
 from actur import show_news
