@@ -65,9 +65,9 @@ def is_summary_in_db(target_hash, summary):
     return False
 
 
-def find_text(search_text: str):
+def find_text(collname: str, search_text: str):
     db = get_db()
-    return db.articles.find({"$text": {"$search": search_text}})
+    return db[collname].find({"$text": {"$search": search_text}}).sort("pubdate", 1)
 
 
 def find_articles_by_pubname(pubname: str):
@@ -90,6 +90,8 @@ def make_tempdb_from_daterange(start, end):
         {"$out": "daterange"},
     ]
     db.articles.aggregate(pipeline)
+    db.daterange.create_index([("pubdate", pymongo.DESCENDING)])
+    db.daterange.create_index([("summary", pymongo.TEXT)])
 
 
 def today_range():
