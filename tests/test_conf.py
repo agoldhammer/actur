@@ -27,6 +27,8 @@ def test_config_and_feedparsing():
 
 
 # ensure that every configured feed can read its url
+# ! This test is slow, so omit from coverage
+@pytest.mark.no_cover
 def test_feeds():
     pubs = feeds.get_publications()
     for pub in pubs:

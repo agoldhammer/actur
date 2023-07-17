@@ -14,3 +14,5 @@ add start, end to show news (not yet implemented)
 
 
 
+coverage
+pytest --cov=actur tests/
