@@ -3,6 +3,10 @@ import datetime
 import feedparser
 from actur.utils import dbif, feeds, hasher
 
+_total_processed: int = 0
+_total_added: int = 0
+_total_skipped: int = 0
+
 
 def pcounters():
     n_processed = 0
@@ -28,6 +32,7 @@ def pcounters():
 
 
 def process_feed(feed: feeds.Feed, pubname: str):
+    global _total_processed, _total_added, _total_skipped
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
     url = feed.url
@@ -38,10 +43,13 @@ def process_feed(feed: feeds.Feed, pubname: str):
     # ! NO, b/c Some feeds seem to have no attr title
     # print("Feed title:", d.feed.title)
     print("Version:", d.version)
-    print("bozo/status", d.bozo, d.status)
+    if d.bozo:
+        print("XML is ill-formed")
+    print("Status:", d.status)
     print("no. entries", len(d.entries))
     for entry in d.entries:
         bump_processed()
+        _total_processed += 1
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
         ehash = hasher.ag_hash(entry.summary)
@@ -49,6 +57,7 @@ def process_feed(feed: feeds.Feed, pubname: str):
         already_in = dbif.is_summary_in_db(ehash, entry.summary)
         if already_in:
             bump_skipped()
+            _total_skipped += 1
         else:
             entry.pop("summary_detail", "")
             entry.pop("guidislink", "")
@@ -57,6 +66,7 @@ def process_feed(feed: feeds.Feed, pubname: str):
             entry["feedname"] = feedname
             dbif.save_article(entry)
             bump_added()
+            _total_added += 1
     print(get_counts())
 
 
@@ -70,8 +80,15 @@ def parse_pub(pub: feeds.Publication):
 
 
 def process_pubs():
+    global _total_added, _total_processed, _total_skipped
+    _total_processed = _total_added = _total_skipped = 0
     for pub in feeds.get_publications():
         parse_pub(pub)
+    ndocs = dbif.get_article_count()
+    print(f"Read complete. No. docs in db: {ndocs}")
+    print(
+        f"Processed: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}"
+    )
 
 
 def main():

@@ -43,6 +43,11 @@ def save_article(entry):
     db.articles.insert_one(entry)
 
 
+def get_article_count() -> int:
+    db = get_db()
+    return db.articles.count_documents({})
+
+
 def is_summary_in_db(target_hash, summary):
     db = get_db()
     # print("checking hash", target_hash)
