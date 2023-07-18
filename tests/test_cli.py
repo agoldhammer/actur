@@ -4,7 +4,7 @@
 
 from click.testing import CliRunner
 
-from actur import show_news
+from actur import actu_cli
 
 
 # @pytest.fixture
@@ -26,10 +26,10 @@ from actur import show_news
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()
-    result = runner.invoke(show_news.main)
+    result = runner.invoke(actu_cli.cli)
     assert result.exit_code == 0  # nosec
     # assert "actur.show_news.main" in result.output  # nosec
-    help_result = runner.invoke(show_news.main, ["--help"])
+    help_result = runner.invoke(actu_cli.cli, ["--help"])
     assert help_result.exit_code == 0  # nosec
     print(help_result.output)
     assert "--help" in help_result.output  # nosec
