@@ -34,14 +34,10 @@ def calc_time_range(
         return errmsg, None, None
     if days or hours:
         return daterange_from_deltas(days, hours)
-    if end and not start:
-        errmsg = "End specified without start"
-        return errmsg, None, None
-    else:
-        if start is not None:
-            start_dt = pa.parse(start)
-        else:
-            start_dt = pd.now().in_timezone("UTC").subtract(days=1)
+    if end and start is not None:
+        start_dt = pa.parse(start)
+    else:  # assume 1 day ago for missing start
+        start_dt = pd.now().in_timezone("UTC").subtract(days=1)
     if end is None:
         end_dt = pd.now().in_timezone("UTC")
     else:
