@@ -1,4 +1,3 @@
-"""Console script for actur."""
 import sys
 
 import click
@@ -29,7 +28,7 @@ def show(
     days: int,
     hours: int,
 ):
-    """Console script for actur."""
+    """Select and display articles"""
     dbif.init_db()
     if list:
         pubs = feeds.get_publications()
@@ -52,6 +51,7 @@ def show(
 
 @cli.command()
 def read():
+    """Check news feeds for new articles"""
     reader.main()
 
 
