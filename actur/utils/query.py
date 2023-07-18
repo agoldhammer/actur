@@ -6,7 +6,7 @@ import datetime as dt
 def calc_time_range(
     start: str | None, end: str | None, days: int | None, hours: int | None
 ) -> tuple[str | None, dt.datetime | None, dt.datetime | None]:
-    print("creating temp dr")
+    print("Creating temporary datarange collection")
     print("Time Params:", start, end, days, hours)
     errmsg = None
     start_dt = None

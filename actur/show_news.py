@@ -34,7 +34,7 @@ def main(
         return 0
     # creating temporary data range
 
-    query.create_temp_daterange(None, None, days, hours)
+    query.create_temp_daterange(start, end, days, hours)
     # pubname is a list, since it may be specified multiple times
     # on command line
     if "all" in pubnames:
