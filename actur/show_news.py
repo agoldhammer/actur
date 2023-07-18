@@ -32,19 +32,15 @@ def main(
         for pub in pubs:
             print(pub)
         return 0
-    if (start or end) and (days or hours):
-        print("Error: Cannot specify explicit start or end with days or hours option")
-        return 0
-    if days is not None or hours is not None:
-        print("creating temp dr")
-        print(days, hours)
-        query.create_temp_daterange(days, hours)
-        # pubname is a list, since it may be specified multiple times
-        # on command line
-        if "all" in pubnames:
-            pubnames = [pub.name for pub in feeds.get_publications()]
-        articles = dbif.get_articles_in_daterange(pubnames)
-        display.display_articles(articles, summary_flag=summary)
+    # creating temporary data range
+
+    query.create_temp_daterange(None, None, days, hours)
+    # pubname is a list, since it may be specified multiple times
+    # on command line
+    if "all" in pubnames:
+        pubnames = [pub.name for pub in feeds.get_publications()]
+    articles = dbif.get_articles_in_daterange(pubnames)
+    display.display_articles(articles, summary_flag=summary)
 
     return 0
 
