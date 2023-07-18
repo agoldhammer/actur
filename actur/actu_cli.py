@@ -4,10 +4,15 @@ import sys
 import click
 
 from actur.utils import dbif, display, feeds, query
+from actur import reader
 
 
-@click.command()
-# @click.option("--pubname", "-p", multiple=True, default=["all"], help="pubname")
+@click.group()
+def cli():
+    click.echo("CLI for actu newsreader")
+
+
+@cli.command()
 @click.option("--start", "-s", help="start date")
 @click.option("--end", "-e", help="end date")
 @click.option("--days", "-d", type=int, help="days ago")
@@ -15,7 +20,7 @@ from actur.utils import dbif, display, feeds, query
 @click.option("--summary", is_flag=True, help="Display summaries")
 @click.option("--list", is_flag=True, help="List publications")
 @click.argument("pubnames", nargs=-1)
-def main(
+def show(
     list: bool,
     summary: bool,
     pubnames: list[str],
@@ -45,6 +50,11 @@ def main(
     return 0
 
 
+@cli.command()
+def read():
+    reader.main()
+
+
 if __name__ == "__main__":
     print(sys.path)
-    sys.exit(main())  # pragma: no cover
+    sys.exit(cli())  # pragma: no cover
