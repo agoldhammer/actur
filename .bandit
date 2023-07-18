@@ -1,4 +1,2 @@
 [bandit]
-exclude = tests
-tests = B101
-
+skips = B101

@@ -31,5 +31,5 @@ def test_command_line_interface():
     # assert "actur.show_news.main" in result.output  # nosec
     help_result = runner.invoke(actu_cli.cli, ["--help"])
     assert help_result.exit_code == 0  # nosec
-    print(help_result.output)
+    # print(help_result.output)
     assert "--help" in help_result.output  # nosec
