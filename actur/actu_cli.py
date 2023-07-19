@@ -31,25 +31,17 @@ def show(
     group: str,
 ):
     """Select and display articles"""
+    # list publications
     if list:
         pubs = feeds.get_publications()
         print("Feeds:\n----\n")
         for pub in pubs:
             print(pub)
         return 0
-    # creating temporary data range
-
-    # query.create_temp_daterange(start, end, days, hours)
+    # select articles
     articles = query.get_arts_in_daterange_from_pubs(
         pubnames, start, end, days, hours, group
     )
-    # pubname is a list, since it may be specified multiple times
-    # on command line
-    # if "all" in pubnames:
-    #     pubnames = [pub.name for pub in feeds.get_publications()]
-    # if group is not None:
-    #     pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
-    # articles = dbif.get_articles_in_daterange(pubnames)
     display.display_articles(articles, summary_flag=summary)
 
     return 0
