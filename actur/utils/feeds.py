@@ -2,8 +2,6 @@ from dataclasses import dataclass
 
 from actur.config import readconf as rc
 
-# from actur.utils import dbif
-
 
 @dataclass
 class Feed:

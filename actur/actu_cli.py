@@ -2,7 +2,7 @@ import sys
 
 import click
 
-from actur.utils import dbif, display, feeds, query
+from actur.utils import display, feeds, query
 from actur import reader
 
 
@@ -31,7 +31,6 @@ def show(
     group: str,
 ):
     """Select and display articles"""
-    # dbif.init_db()
     if list:
         pubs = feeds.get_publications()
         print("Feeds:\n----\n")
@@ -40,14 +39,15 @@ def show(
         return 0
     # creating temporary data range
 
-    query.create_temp_daterange(start, end, days, hours)
+    # query.create_temp_daterange(start, end, days, hours)
+    articles = query.get_pubs_in_daterange(pubnames, start, end, days, hours, group)
     # pubname is a list, since it may be specified multiple times
     # on command line
-    if "all" in pubnames:
-        pubnames = [pub.name for pub in feeds.get_publications()]
-    if group is not None:
-        pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
-    articles = dbif.get_articles_in_daterange(pubnames)
+    # if "all" in pubnames:
+    #     pubnames = [pub.name for pub in feeds.get_publications()]
+    # if group is not None:
+    #     pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
+    # articles = dbif.get_articles_in_daterange(pubnames)
     display.display_articles(articles, summary_flag=summary)
 
     return 0

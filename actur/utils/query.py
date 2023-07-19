@@ -4,7 +4,7 @@ import sys
 import pendulum as pd
 import pendulum.parsing as pa
 
-from actur.utils import dbif
+from actur.utils import dbif, feeds
 
 DT = dt.datetime
 
@@ -57,10 +57,26 @@ def create_temp_daterange(
     if errmsg is not None:
         print(f"Error: {errmsg}\n")
     else:
-        # print("Range", start_dt, end_dt)
-        # print(f"Types: {type(start_dt)}, {type(end_dt)}\n")
         print(f"New date range: {start_dt} to {end_dt}\n")
         dbif.make_tempdb_from_daterange(start_dt, end_dt)
+
+
+def get_pubs_in_daterange(
+    pubnames: list[str],
+    start: str | None,
+    end: str | None,
+    days: int | None,
+    hours: int | None,
+    group: str | None = None,
+):
+    create_temp_daterange(start, end, days, hours)
+
+    if "all" in pubnames:
+        pubnames = [pub.name for pub in feeds.get_publications()]
+    if group is not None:
+        pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
+    articles = dbif.get_articles_in_daterange(pubnames)
+    return articles
 
 
 def main():
