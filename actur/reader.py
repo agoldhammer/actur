@@ -79,19 +79,19 @@ def parse_pub(pub: feeds.Publication):
     print(20 * "*")
 
 
-def process_pubs(group: str | None):
+def process_pubs(xgroup: str | None):
     """parse feed for pubs
 
     Args:
-        group (str | None): if group specified, proc only pubs in groupescription_
+        xgroup (str | None): if group specified, exclude from read_
     """
     global _total_added, _total_processed, _total_skipped
     _total_processed = _total_added = _total_skipped = 0
 
     _ = dbif.get_db()  # to initialize db
     pubs = feeds.get_publications()
-    if group is not None:
-        pubs = [pub for pub in pubs if pub.group == group]
+    if xgroup is not None:
+        pubs = [pub for pub in pubs if pub.group != xgroup]
 
     for pub in pubs:
         parse_pub(pub)

@@ -54,10 +54,10 @@ def show(
 
 
 @cli.command()
-@click.option("--group", "-g", help="group to include in read (opt)")
-def read(group):
+@click.option("--xgroup", "-x", help="group to exclude from read (opt)")
+def read(xgroup):
     """Check news feeds for new articles"""
-    reader.process_pubs(group)
+    reader.process_pubs(xgroup)
 
 
 if __name__ == "__main__":
