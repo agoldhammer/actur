@@ -9,25 +9,25 @@ _dbname: str | None = None
 # _default_host = "mongodb://192.168.0.128"
 
 
-# class ActuDBError(Exception):
-#     def __init__(self, value):
-#         self.value = value
-#         super().__init__(value)
+class ActuDBError(Exception):
+    def __init__(self, value):
+        self.value = value
+        super().__init__(value)
 
 
 def get_db():
     global _client, _dbname
     # sanity check
     if _dbname is None:
-        # raise ActuDBError("DB name not defined. Must call init_db first.")
-        _init_db()
+        raise ActuDBError("DB name not defined. Must call init_db first.")
+        # _init_db()
     return _client[_dbname]
 
 
 def _init_db():
     global _host, _client, _dbname
     if _host is None or _dbname is None:  # not yet initialized, so read conf
-        rc.read_conf()
+        # rc.read_conf() # rc is read on load
         database = rc.get_conf_by_key("database")
         _host = database["url"]
         _dbname = database["dbname"]
@@ -119,3 +119,7 @@ def view_past_day():
         # print(f"{article['pubname']}: {article['pubdate']}")
         # print(article["title"])
         display.display_article(article, summary_flag=True)
+
+
+# call on load to initialize db
+_init_db()
