@@ -88,7 +88,7 @@ def process_pubs(group: str | None):
     global _total_added, _total_processed, _total_skipped
     _total_processed = _total_added = _total_skipped = 0
 
-    dbif.init_db()
+    _ = dbif.get_db()  # to initialize db
     pubs = feeds.get_publications()
     if group is not None:
         pubs = [pub for pub in pubs if pub.group == group]

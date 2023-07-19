@@ -5,6 +5,7 @@
 from click.testing import CliRunner
 
 from actur import actu_cli
+from actur.utils import dbif
 
 
 def test_command_line_interface():
@@ -20,6 +21,7 @@ def test_command_line_interface():
 
 
 def test_show_list():
+    _ = dbif.get_db()
     runner = CliRunner()
     res = runner.invoke(actu_cli.cli, ["show", "--list"])
     assert "LeMonde" in res.output  # nosec B101

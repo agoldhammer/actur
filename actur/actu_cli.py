@@ -31,7 +31,7 @@ def show(
     group: str,
 ):
     """Select and display articles"""
-    dbif.init_db()
+    # dbif.init_db()
     if list:
         pubs = feeds.get_publications()
         print("Feeds:\n----\n")

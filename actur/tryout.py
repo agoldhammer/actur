@@ -25,7 +25,7 @@ from actur.utils import dbif
 #     for feed in conf_feeds:
 #         print(feed)
 def main():
-    dbif.init_db()
+    # dbif.init_db()
     # db = dbif.get_db()
     articles = dbif.find_text("daterange", "Macron Borne Mélenchon")
     for article in articles:

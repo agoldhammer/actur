@@ -5,14 +5,15 @@ import feedparser
 import pytest
 
 
-@pytest.fixture(autouse=True, scope="module")
-def setup():
-    dbif.init_db()
-    yield
+# @pytest.fixture(autouse=True, scope="module")
+# def setup():
+#     # dbif.init_db()
+#     yield
 
 
 def test_config_and_feedparsing():
     # test setting of database
+    _ = dbif.get_db()  # needed to initialize the db
     res = readconf.get_conf_by_key("database")
     assert "dbname" in res  # nosec
     assert "url" in res  # nosec

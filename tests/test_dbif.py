@@ -1,12 +1,12 @@
-import pytest
+# import pytest
 
 from actur.utils import dbif
 
 
-@pytest.fixture(autouse=True, scope="module")
-def setup():
-    dbif.init_db()
-    yield
+# @pytest.fixture(autouse=True, scope="module")
+# def setup():
+#     dbif.init_db()
+#     yield
 
 
 def test_count():

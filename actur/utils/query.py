@@ -68,7 +68,7 @@ def main():
 
 
 if __name__ == "__main__":
-    dbif.init_db()
+    # dbif.init_db()
     # should return an error
     create_temp_daterange(start="2023-07-16", end=None, days=1, hours=1)
     create_temp_daterange("2023-07-16", "2023-07-17", None, None)

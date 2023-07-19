@@ -5,27 +5,28 @@ from ..config import readconf as rc
 
 _host: str | None = None
 _client: pymongo.MongoClient
-_dbname: str = ""
+_dbname: str | None = None
 # _default_host = "mongodb://192.168.0.128"
 
 
-class ActuDBError(Exception):
-    def __init__(self, value):
-        self.value = value
-        super().__init__(value)
+# class ActuDBError(Exception):
+#     def __init__(self, value):
+#         self.value = value
+#         super().__init__(value)
 
 
 def get_db():
     global _client, _dbname
     # sanity check
-    if _dbname == "":
-        raise ActuDBError("DB name not defined. Must call init_db first.")
+    if _dbname is None:
+        # raise ActuDBError("DB name not defined. Must call init_db first.")
+        _init_db()
     return _client[_dbname]
 
 
-def init_db():
+def _init_db():
     global _host, _client, _dbname
-    if _host is None:  # not yet initialized, so read conf
+    if _host is None or _dbname is None:  # not yet initialized, so read conf
         rc.read_conf()
         database = rc.get_conf_by_key("database")
         _host = database["url"]
@@ -105,7 +106,7 @@ def get_articles_in_daterange(pubnames: list[str]):
 
 # ! For testing only!!
 def view_past_day():
-    init_db()
+    _init_db()
 
     start = pendulum.today()
     end = pendulum.tomorrow()
