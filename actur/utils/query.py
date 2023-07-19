@@ -61,7 +61,7 @@ def create_temp_daterange(
         dbif.make_tempdb_from_daterange(start_dt, end_dt)
 
 
-def get_pubs_in_daterange(
+def get_arts_in_daterange_from_pubs(
     pubnames: list[str],
     start: str | None,
     end: str | None,

@@ -1,6 +1,6 @@
 import pendulum
 import pymongo
-from . import display
+from bson.json_util import dumps
 from ..config import readconf as rc
 
 _host: str | None = None
@@ -95,21 +95,8 @@ def get_articles_in_daterange(pubnames: list[str]):
     return db.daterange.find({"pubname": {"$in": pubnames}}).sort("pubdate", 1)
 
 
-# ! For testing only!!
-def view_past_day():
-    _init_db()
-
-    start = pendulum.today()
-    end = pendulum.tomorrow()
-
-    print("\nsorting")
-    cursor = find_articles_by_daterange(start, end).sort(
-        [("pubname", 1), ("pubdate", -1)]
-    )
-    for article in cursor:
-        # print(f"{article['pubname']}: {article['pubdate']}")
-        # print(article["title"])
-        display.display_article(article, summary_flag=True)
+def cursor_to_json(cursor):
+    return dumps(cursor)
 
 
 # call on load to initialize db

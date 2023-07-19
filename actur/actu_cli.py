@@ -40,7 +40,9 @@ def show(
     # creating temporary data range
 
     # query.create_temp_daterange(start, end, days, hours)
-    articles = query.get_pubs_in_daterange(pubnames, start, end, days, hours, group)
+    articles = query.get_arts_in_daterange_from_pubs(
+        pubnames, start, end, days, hours, group
+    )
     # pubname is a list, since it may be specified multiple times
     # on command line
     # if "all" in pubnames:
