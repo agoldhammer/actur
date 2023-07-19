@@ -29,6 +29,7 @@ def make_pub(name: str, group: str, rawfeeds: list):
 
 def get_publications() -> list[Publication]:
     pubs = []
+    # _ = dbif.get_db()
     rawpubs = rc.get_conf_by_key("Publications")
     for rawpub in rawpubs:
         name = rawpub["name"]

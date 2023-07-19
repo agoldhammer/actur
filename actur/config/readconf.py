@@ -7,7 +7,7 @@ _conf_file_name = "~/Prog/actur/actur/actur.toml"
 _conf: None | dict[str, Any] = None
 
 
-def read_conf() -> None:
+def _read_conf() -> None:
     global _conf, _conf_file_name
 
     conf_from_env = os.getenv("ACTURCONF")
@@ -25,3 +25,6 @@ def get_conf_by_key(key: str) -> Any:
     if _conf is None or key not in _conf:
         raise Exception(f"No configuration data or key '{key}' is missing")
     return _conf[key]
+
+
+_read_conf()  # call on load to initialize

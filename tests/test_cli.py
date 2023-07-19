@@ -4,32 +4,23 @@
 
 from click.testing import CliRunner
 
-from actur import show_news
+from actur import actu_cli
 
-
-# @pytest.fixture
-# def response():
-#     """Sample pytest fixture.
-
-#     See more at: http://doc.pytest.org/en/latest/fixture.html
-#     """
-#     # import requests
-#     # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
-
-
-# def test_content(response):
-#     """Sample pytest test function with the pytest fixture as an argument."""
-#     # from bs4 import BeautifulSoup
-#     # assert 'GitHub' in BeautifulSoup(response.content).title.string
+# from actur.utils import dbif
 
 
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()
-    result = runner.invoke(show_news.main)
+    result = runner.invoke(actu_cli.cli)
     assert result.exit_code == 0  # nosec
-    # assert "actur.show_news.main" in result.output  # nosec
-    help_result = runner.invoke(show_news.main, ["--help"])
+    help_result = runner.invoke(actu_cli.cli, ["--help"])
     assert help_result.exit_code == 0  # nosec
-    print(help_result.output)
     assert "--help" in help_result.output  # nosec
+
+
+def test_show_list():
+    runner = CliRunner()
+    res = runner.invoke(actu_cli.cli, ["show", "--list"])
+    assert "LeMonde" in res.output  # nosec B101
+    assert res.exit_code == 0  # nosec B101

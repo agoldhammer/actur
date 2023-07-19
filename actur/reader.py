@@ -39,9 +39,6 @@ def process_feed(feed: feeds.Feed, pubname: str):
     print("Feed:", feedname)
     print(20 * "_")
     d = feedparser.parse(url)
-    # !: Should d.feed.title be stored instead of feed.name?
-    # ! NO, b/c Some feeds seem to have no attr title
-    # print("Feed title:", d.feed.title)
     print("Version:", d.version)
     if d.bozo:
         print("XML is ill-formed")
@@ -79,10 +76,20 @@ def parse_pub(pub: feeds.Publication):
     print(20 * "*")
 
 
-def process_pubs():
+def process_pubs(xgroup: str | None):
+    """parse feed for pubs
+
+    Args:
+        xgroup (str | None): if group specified, exclude from read_
+    """
     global _total_added, _total_processed, _total_skipped
     _total_processed = _total_added = _total_skipped = 0
-    for pub in feeds.get_publications():
+
+    pubs = feeds.get_publications()
+    if xgroup is not None:
+        pubs = [pub for pub in pubs if pub.group != xgroup]
+
+    for pub in pubs:
         parse_pub(pub)
     ndocs = dbif.get_article_count()
     print(f"Read complete. No. docs in db: {ndocs}")
@@ -92,8 +99,7 @@ def process_pubs():
 
 
 def main():
-    dbif.init_db()
-    process_pubs()
+    process_pubs(None)
 
 
 if __name__ == "__main__":

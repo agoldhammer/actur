@@ -1,6 +1,5 @@
 # import actur.config.readconf as rc
 # import actur.utils.feeds as feeds
-from actur.utils import dbif
 
 
 # def main():
@@ -25,13 +24,18 @@ from actur.utils import dbif
 #     for feed in conf_feeds:
 #         print(feed)
 def main():
-    dbif.init_db()
+    # dbif.init_db()
     # db = dbif.get_db()
-    articles = dbif.find_text("daterange", "Macron Borne Mélenchon")
-    for article in articles:
-        print(article["pubdate"])
-        print(article["title"])
-        print("...")
+    # articles = dbif.find_text("daterange", "Macron Borne Mélenchon")
+    # for article in articles:
+    #     print(article["pubdate"])
+    #     print(article["title"])
+    #     print("...")
+    from actur.utils import query, dbif
+
+    articles = query.get_arts_in_daterange_from_pubs(["SZ"], None, None, 0, 4, None)
+    jquery = dbif.cursor_to_json(articles)
+    print(jquery)
 
 
 if __name__ == "__main__":
