@@ -18,6 +18,7 @@ def cli():
 @click.option("--hours", "-h", type=int, help="hours ago")
 @click.option("--summary", is_flag=True, help="Display summaries")
 @click.option("--list", is_flag=True, help="List publications")
+@click.option("--group", "-g", help="group to show")
 @click.argument("pubnames", nargs=-1)
 def show(
     list: bool,
@@ -27,6 +28,7 @@ def show(
     end: str,
     days: int,
     hours: int,
+    group: str,
 ):
     """Select and display articles"""
     dbif.init_db()
@@ -43,6 +45,8 @@ def show(
     # on command line
     if "all" in pubnames:
         pubnames = [pub.name for pub in feeds.get_publications()]
+    if group is not None:
+        pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
     articles = dbif.get_articles_in_daterange(pubnames)
     display.display_articles(articles, summary_flag=summary)
 
@@ -50,9 +54,10 @@ def show(
 
 
 @cli.command()
-def read():
+@click.option("--group", "-g", help="group to include in read (opt)")
+def read(group):
     """Check news feeds for new articles"""
-    reader.main()
+    reader.process_pubs(group)
 
 
 if __name__ == "__main__":

@@ -79,10 +79,21 @@ def parse_pub(pub: feeds.Publication):
     print(20 * "*")
 
 
-def process_pubs():
+def process_pubs(group: str | None):
+    """parse feed for pubs
+
+    Args:
+        group (str | None): if group specified, proc only pubs in groupescription_
+    """
     global _total_added, _total_processed, _total_skipped
     _total_processed = _total_added = _total_skipped = 0
-    for pub in feeds.get_publications():
+
+    dbif.init_db()
+    pubs = feeds.get_publications()
+    if group is not None:
+        pubs = [pub for pub in pubs if pub.group == group]
+
+    for pub in pubs:
         parse_pub(pub)
     ndocs = dbif.get_article_count()
     print(f"Read complete. No. docs in db: {ndocs}")
@@ -92,8 +103,7 @@ def process_pubs():
 
 
 def main():
-    dbif.init_db()
-    process_pubs()
+    process_pubs(None)
 
 
 if __name__ == "__main__":
