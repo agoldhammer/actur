@@ -20,7 +20,3 @@ NB: dbif.get_db reads the conf file and inits database, is idempotent
 ## coverage
 
 pytest --cov=actur tests/
-
-## mongodb Atlas conn
-
-mongodb+srv://artgoldhammer:<**\***>@cluster0.zgkuql4.mongodb.net/
