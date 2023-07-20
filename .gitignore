@@ -162,3 +162,5 @@ cython_debug/
 # VSCode
 *.code-workspace
 
+# private info
+mongocred.txt

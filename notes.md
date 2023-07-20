@@ -1,5 +1,7 @@
 # Notes for ACTUR project
 
+<!-- markdownlint-disable MD030 -->
+
 -   DONE add pub name to stored article
 -   DONE search by date
 -   DONE do nice display routine
