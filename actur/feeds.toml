@@ -1,0 +1,145 @@
+
+[[Publications]]
+name = "LeMonde"
+group = "France"
+feeds = [
+    [
+        "Politique",
+        "https://www.lemonde.fr/politique/rss_full.xml",
+    ],
+    [
+        "Une",
+        "https://www.lemonde.fr/rss/une.xml",
+    ],
+    [
+        "Idées",
+        "https://www.lemonde.fr/idees/rss_full.xml",
+    ],
+]
+
+[[Publications]]
+name = "Libération"
+group = "France"
+feeds = [
+    [
+        "all",
+        "https://www.liberation.fr/arc/outboundfeeds/rss-all/?outputType=xml",
+    ],
+]
+
+[[Publications]]
+name = "SZ"
+group = "Germany"
+feeds = [["TopThemen", "https://rss.sueddeutsche.de/rss/Topthemen"]]
+
+[[Publications]]
+name = "Corriere"
+group = "Italy"
+feeds = [["all", "http://xml2.corriereobjects.it/rss/homepage.xml"]]
+
+[[Publications]]
+name = "Zeit"
+group = "Germany"
+feeds = [["Zeit - all", "https://newsfeed.zeit.de/index"]]
+
+[[Publications]]
+name = "Handelsblatt"
+group = "Germany"
+feeds = [
+    [
+        "Handelsblatt - all",
+        "https://www.handelsblatt.com/contentexport/feed/top-themen",
+    ],
+]
+
+# [[Publications]]
+# name = "FAZ"
+# feeds = [["FAZ - all", "https://faz.net/rss/aktuel"]]
+
+[[Publications]]
+name = "LesEchos"
+group = "France"
+feeds = [
+    [
+        "Echos - Idées",
+        "https://services.lesechos.fr/rss/les-echos-idees.xml",
+    ],
+    [
+        "Echos - Economie",
+        "https://services.lesechos.fr/rss/les-echos-economie.xml",
+    ],
+    [
+        "Echos - Finance/Marchés",
+        "https://services.lesechos.fr/rss/les-echos-finance-marches.xml",
+    ],
+]
+
+[[Publications]]
+name = "Guardian"
+group = "UK"
+feeds = [["TopStories", "https://theguardian.com/uk/rss"]]
+
+[[Publications]]
+name = "NYTimes"
+group = "US"
+feeds = [
+    [
+        "Homepage",
+        "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    ],
+]
+
+[[Publications]]
+name = "Wapo"
+group = "US"
+feeds = [
+    [
+        "World",
+        "https://feeds.washingtonpost.com/rss/world?itid=lk_inline_manual_36",
+    ],
+    [
+        "National",
+        "https://feeds.washingtonpost.com/rss/national?itid=lk_inline_manual_32",
+    ],
+    [
+        "Opinion",
+        "https://www.washingtonpost.com/arcio/rss/category/opinions/?itid=lk_inline_manual_7",
+    ],
+]
+
+[[Publications]]
+name = "WSJ"
+group = "US"
+feeds = [
+    [
+        "World",
+        "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+    ],
+    [
+        "Opinion",
+        "https://feeds.a.dj.com/rss/RSSOpinion.xml",
+    ],
+    [
+        "Tech",
+        "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+    ],
+]
+
+# ! Template
+# [[Publications]]
+# name = 
+# group = 
+# feeds = [
+#     [
+#         "feedname1",
+#         "https://feedname1.url",
+#     ],
+#     [
+#         "feedname2",
+#         "https://feedname2.url",
+#     ],
+#     [
+#         "feedname3",
+#         "https://feedname3.url",
+#     ],
+# ]
