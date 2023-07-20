@@ -94,7 +94,7 @@ def get_articles_in_daterange(pubnames: list[str]):
     db = get_db()
     return db.daterange.find(
         {"pubname": {"$in": pubnames}},
-        {"pubdate": 1, "pubname": 1, "summary": 1, "title": 1},
+        {"pubdate": 1, "pubname": 1, "summary": 1, "title": 1, "link": 1},
     ).sort("pubdate", 1)
 
 
