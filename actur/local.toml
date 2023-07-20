@@ -4,4 +4,4 @@ url = "mongodb://192.168.0.128:27017"
 dbname = "actur"
 
 [feedconfig]
-path = "~/Prog/actur/feeds.toml"
+path = "~/Prog/actur/actur/feeds.toml"
