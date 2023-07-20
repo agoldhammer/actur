@@ -1,6 +1,6 @@
 import pendulum
 import pymongo
-from bson.json_util import dumps
+from bson.json_util import dumps, RELAXED_JSON_OPTIONS
 from ..config import readconf as rc
 
 _host: str | None = None
@@ -94,12 +94,20 @@ def get_articles_in_daterange(pubnames: list[str]):
     db = get_db()
     return db.daterange.find(
         {"pubname": {"$in": pubnames}},
-        {"pubdate": 1, "pubname": 1, "summary": 1, "title": 1, "link": 1},
+        {
+            "pubdate": 1,
+            "pubname": 1,
+            "summary": 1,
+            "title": 1,
+            "link": 1,
+            "published": 1,
+            "published_parsed": 1,
+        },
     ).sort("pubdate", 1)
 
 
 def cursor_to_json(cursor):
-    return dumps(cursor)
+    return dumps(cursor, json_options=RELAXED_JSON_OPTIONS)
 
 
 # call on load to initialize db

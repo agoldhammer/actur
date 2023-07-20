@@ -12,7 +12,8 @@ def _read_conf() -> None:
 
     conf_from_env = os.getenv("ACTURCONF")
     if conf_from_env is not None:
-        conf_file_name = os.path.expanduser(conf_from_env)
+        conf_path = os.path.expanduser(conf_from_env)
+        conf_file_name = conf_path + "/" + "actur.toml"
     else:  # use default if no spec in env
         conf_file_name = os.path.expanduser(_conf_file_name)
     with open(conf_file_name, "rb") as fp:
