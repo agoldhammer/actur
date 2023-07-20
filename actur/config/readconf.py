@@ -2,7 +2,7 @@ import os
 import tomllib
 from typing import Any
 
-_default_conf_file_path = "~/Prog/actur/actur/local.toml"
+_default_conf_file_path = "~/.actur/local.toml"
 
 _conf: None | dict[str, Any] = None
 
