@@ -36,7 +36,10 @@ def show(
         pubs = feeds.get_publications()
         print("Feeds:\n----\n")
         for pub in pubs:
-            print(pub)
+            print(f"Name: {pub.name} - Group: {pub.group}")
+            for feed in pub.feeds:
+                print(f"...Feed name: {feed.name}")
+            print(20 * "=")
         return 0
     # select articles
     articles = query.get_arts_in_daterange_from_pubs(

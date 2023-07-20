@@ -124,7 +124,7 @@ feeds = [
         "https://feeds.a.dj.com/rss/RSSOpinion.xml",
     ],
     [
-        "feedname3",
+        "Tech",
         "https://feeds.a.dj.com/rss/RSSWSJD.xml",
     ],
 ]
