@@ -20,3 +20,7 @@ NB: dbif.get_db reads the conf file and inits database, is idempotent
 ## coverage
 
 pytest --cov=actur tests/
+
+## on git guardian and precommit hooks
+
+[https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit#:~:text=A%20pre%2Dcommit%20hook%20is,through%20our%20CLI%20application%3A%20ggshield%20.]
