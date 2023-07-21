@@ -51,10 +51,12 @@ def show(
 
 
 @cli.command()
-@click.option("--xgroup", "-x", help="group to exclude from read (opt)")
-def read(xgroup):
+@click.option("--xgroup", "-x", help="Group to exclude from read (opt)")
+@click.option("--silent", is_flag=True, help="No console output")
+@click.option("--no-logging", is_flag=True, help="Do not write to log file")
+def read(xgroup, silent: bool, no_logging: bool):
     """Check news feeds for new articles"""
-    reader.process_pubs(xgroup)
+    reader.process_pubs(xgroup, silent, no_logging)
 
 
 if __name__ == "__main__":
