@@ -114,7 +114,7 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool):
     """
     global _total_added, _total_processed, _total_skipped, _logger
     _total_added = _total_processed = _total_skipped = 0
-    # setup_logging()
+    msg = ""
 
     pubs = feeds.get_publications()
     if xgroup is not None:
