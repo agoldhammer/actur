@@ -1,10 +1,12 @@
 import datetime
 import logging
 import os
+import time
 
 import feedparser
-from actur.utils import dbif, feeds, hasher
+
 from actur.config import readconf as rc
+from actur.utils import dbif, feeds, hasher
 
 _total_processed: int = 0
 _total_added: int = 0
@@ -22,6 +24,7 @@ def setup_logging():
     fh = logging.FileHandler(LOGFILEPATH)
     fh.setLevel(logging.INFO)
     myformat = logging.Formatter("%(asctime)s-%(name)s:%(levelname)s--%(message)s")
+    logging.Formatter.converter = time.gmtime
     fh.setFormatter(myformat)
     _logger.addHandler(fh)
 
