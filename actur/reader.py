@@ -113,23 +113,21 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool):
         xgroup (str | None): if group specified, exclude from read_
     """
     global _total_added, _total_processed, _total_skipped, _logger
-    try:
-        setup_logging()
+    _total_added = _total_processed = _total_skipped = 0
+    # setup_logging()
 
-        pubs = feeds.get_publications()
-        if xgroup is not None:
-            pubs = [pub for pub in pubs if pub.group != xgroup]
+    pubs = feeds.get_publications()
+    if xgroup is not None:
+        pubs = [pub for pub in pubs if pub.group != xgroup]
 
-        for pub in pubs:
-            parse_pub(pub, silent)
-        ndocs = dbif.get_article_count()
-        msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. No docs in db: {ndocs}"
-        if not silent:
-            print(msg)
-        if not no_logging:
-            _logger.info(msg)
-    except Exception as e:
-        print(f"Could not read feeds: {e}")
+    for pub in pubs:
+        parse_pub(pub, silent)
+    ndocs = dbif.get_article_count()
+    msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"
+    if not silent:
+        print(msg)
+    if not no_logging:
+        _logger.info(msg)
 
 
 def main():
