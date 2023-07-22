@@ -9,7 +9,8 @@ from actur import reader
 
 @click.group()
 def cli():
-    click.echo("actu Newsreader")
+    # click.echo("actu Newsreader")
+    pass
 
 
 @cli.command()
