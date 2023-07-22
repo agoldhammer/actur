@@ -73,3 +73,7 @@ sudo touch /var/log/actu/reader-atlas.log
 sudo chown -R $(whoami) /var/log/actu/reader-atlas.log
 
 ```
+
+## tricks needed to make supervisord work with conda
+
+see the actur.conf file in helpers
