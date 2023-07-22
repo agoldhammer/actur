@@ -2,22 +2,27 @@ import os
 import tomllib
 from typing import Any
 
-_conf_file_name = "~/Prog/actur/actur/actur.toml"
+_default_conf_file_path = "~/.actur/local.toml"
 
 _conf: None | dict[str, Any] = None
 
 
 def _read_conf() -> None:
-    global _conf, _conf_file_name
+    global _conf, _conf_file_path
+
+    # ACTURCONF, if used, shd specify full path to main conf file
 
     conf_from_env = os.getenv("ACTURCONF")
     if conf_from_env is not None:
-        conf_path = os.path.expanduser(conf_from_env)
-        conf_file_name = conf_path + "/" + "actur.toml"
+        conf_file_path = os.path.expanduser(conf_from_env)
     else:  # use default if no spec in env
-        conf_file_name = os.path.expanduser(_conf_file_name)
-    with open(conf_file_name, "rb") as fp:
+        conf_file_path = os.path.expanduser(_default_conf_file_path)
+    with open(conf_file_path, "rb") as fp:
         _conf = tomllib.load(fp)
+    feed_conf_path = os.path.expanduser(_conf["feedconfig"]["path"])
+    with open(feed_conf_path, "rb") as fp:
+        feed_conf = tomllib.load(fp)
+        _conf |= feed_conf
 
 
 # returns list of dicts of form

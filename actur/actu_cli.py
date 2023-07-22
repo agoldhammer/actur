@@ -1,4 +1,5 @@
 import sys
+from time import sleep
 
 import click
 
@@ -8,7 +9,8 @@ from actur import reader
 
 @click.group()
 def cli():
-    click.echo("CLI for actu newsreader")
+    # click.echo("actu Newsreader")
+    pass
 
 
 @cli.command()
@@ -51,10 +53,23 @@ def show(
 
 
 @cli.command()
-@click.option("--xgroup", "-x", help="group to exclude from read (opt)")
-def read(xgroup):
+@click.option("--xgroup", "-x", help="Group to exclude from read (opt)")
+@click.option("--silent", is_flag=True, help="No console output")
+@click.option("--no-logging", is_flag=True, help="Do not write to log file")
+@click.option("--daemon", "-d", is_flag=True, help="Run as daemon")
+@click.option("--sleeptime", type=int, default=1800, help="Time to sleep in secs")
+def read(xgroup, silent: bool, no_logging: bool, daemon: bool, sleeptime: int):
     """Check news feeds for new articles"""
-    reader.process_pubs(xgroup)
+    try:
+        reader.setup_logging()
+        while True:
+            reader.process_pubs(xgroup, silent, no_logging)
+            if daemon:
+                sleep(sleeptime)
+            else:
+                break
+    except Exception as e:
+        print(f"Could not read feeds: {e}")
 
 
 if __name__ == "__main__":

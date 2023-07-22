@@ -1,5 +1,5 @@
 from actur.config import readconf
-from actur.utils import dbif, feeds
+from actur.utils import feeds
 import feedparser
 
 import pytest
@@ -13,7 +13,6 @@ import pytest
 
 def test_config_and_feedparsing():
     # test setting of database
-    _ = dbif.get_db()  # needed to initialize the db
     res = readconf.get_conf_by_key("database")
     assert "dbname" in res  # nosec
     assert "url" in res  # nosec
