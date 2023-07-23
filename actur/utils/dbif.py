@@ -110,5 +110,11 @@ def cursor_to_json(cursor):
     return dumps(cursor, json_options=RELAXED_JSON_OPTIONS)
 
 
+def find_all():
+    """find all in articles collection and return id, hash"""
+    db = get_db()
+    return db.articles.find({}, {"hash": 1})
+
+
 # call on load to initialize db
 _init_db()
