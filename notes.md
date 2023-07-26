@@ -77,3 +77,7 @@ sudo chown -R $(whoami) /var/log/actu/reader-atlas.log
 ## tricks needed to make supervisord work with conda
 
 for sample supervisord config, see the actur.conf file in actur/extras
+to restart:
+sudo supervisorctl restart actur-atlas
+
+TODO: investigate why no autorestart after DNS failure
