@@ -18,7 +18,9 @@ def extract_kws_from_summary(summary):
     # message = input("User : ")
     print(summary)
     messages = [{"role": "system", "content": "You are an intelligent assistant."}]
-    message = "Extract top 5 keywords from: " + summary
+    message = (
+        "Extract, as a comma-separated list of strings, top 5 keywords from: " + summary
+    )
     if message:
         messages.append(
             {"role": "user", "content": message},
