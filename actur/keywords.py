@@ -1,5 +1,6 @@
-import openai
 import time
+
+import openai
 
 from actur.config.readconf import get_conf_by_key
 from actur.utils.query import get_arts_in_daterange_from_pubs

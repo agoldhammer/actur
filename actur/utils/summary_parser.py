@@ -1,5 +1,6 @@
-import bs4
 from typing import Tuple
+
+import bs4
 
 
 def summary_parse(summary: str) -> Tuple[str, str]:
