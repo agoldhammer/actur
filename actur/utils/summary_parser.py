@@ -23,7 +23,7 @@ def summary_parse(summary: str) -> Tuple[str, str]:
             src = img["src"]
         else:
             src = ""
-        if type(src) is not str:
+        if not isinstance(src, str):
             src = ""
         if type(par) is bs4.Tag:
             summ = par.get_text()
