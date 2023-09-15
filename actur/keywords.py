@@ -35,9 +35,7 @@ def extract_kws_from_title(title):
     # message = input("User : ")
     print(title)
     messages = [{"role": "system", "content": "You are an intelligent assistant."}]
-    message = (
-        "Extract, as a comma-separated list of strings, proper nouns from: " + title
-    )
+    message = "Characterize this text: " + title
     if message:
         messages.append(
             {"role": "user", "content": message},
