@@ -31,13 +31,29 @@ def extract_kws_from_summary(summary):
     print(f"ChatGPT: {reply}")
 
 
+def extract_kws_from_title(title):
+    # message = input("User : ")
+    print(title)
+    messages = [{"role": "system", "content": "You are an intelligent assistant."}]
+    message = (
+        "Extract, as a comma-separated list of strings, proper nouns from: " + title
+    )
+    if message:
+        messages.append(
+            {"role": "user", "content": message},
+        )
+        chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+    reply = chat.choices[0].message.content  # type: ignore
+    print(f"ChatGPT: {reply}")
+
+
 for art in arts:
     count += 1
     print(f"Message {count}")
-    summary = art["summary"]
-    n_tokens = len(summary.split(" "))
+    title = art["title"]
+    n_tokens = len(title.split(" "))
     tot_tokens += n_tokens
-    extract_kws_from_summary(summary)
-    time.sleep(1)
+    extract_kws_from_title(title)
+    time.sleep(0.05)
     print(f"Current token count: {tot_tokens}")
     print("...")
