@@ -126,7 +126,7 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool):
     for pub in pubs:
         parse_pub(pub, silent)
     ndocs = dbif.get_article_count()
-    msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"
+    msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
     if not silent:
         print(msg)
     if not no_logging:
