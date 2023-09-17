@@ -58,12 +58,20 @@ def show(
 @click.option("--no-logging", is_flag=True, help="Do not write to log file")
 @click.option("--daemon", "-d", is_flag=True, help="Run as daemon")
 @click.option("--sleeptime", type=int, default=1800, help="Time to sleep in secs")
-def read(xgroup, silent: bool, no_logging: bool, daemon: bool, sleeptime: int):
+@click.option("--categorize", is_flag=True, help="Categorize with ChatGPT")
+def read(
+    xgroup,
+    silent: bool,
+    no_logging: bool,
+    daemon: bool,
+    sleeptime: int,
+    categorize: bool,
+):
     """Check news feeds for new articles"""
     try:
         reader.setup_logging()
         while True:
-            reader.process_pubs(xgroup, silent, no_logging)
+            reader.process_pubs(xgroup, silent, no_logging, categorize)
             if daemon:
                 sleep(sleeptime)
             else:

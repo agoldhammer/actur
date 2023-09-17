@@ -7,6 +7,7 @@ import feedparser
 
 from actur.config import readconf as rc
 from actur.utils import dbif, feeds, hasher
+from actur.categorize import classify_by_title
 
 _total_processed: int = 0
 _total_added: int = 0
@@ -58,15 +59,19 @@ def pcounters():
     return bump_processed, bump_added, bump_skipped, counts2str
 
 
-def process_feed(feed: feeds.Feed, pubname: str, silent: bool):
+def process_feed(
+    feed: feeds.Feed, pubname: str, silent: bool, no_logging: bool, categorize: bool
+):
     """read, parse, and store one feed
 
     Args:
         feed (feeds.Feed): a Feed descriptor
         pubname (str): publication generating feed
     """
+    global _logger
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
+    print("feedname", feedname)
     url = feed.url
     d = feedparser.parse(url)
     if not silent:
@@ -78,6 +83,7 @@ def process_feed(feed: feeds.Feed, pubname: str, silent: bool):
         print("Status:", d.status)
         print("no. entries", len(d.entries))
     for entry in d.entries:
+        # print(f"Processing {entry.title}")
         bump_processed()
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
@@ -88,28 +94,46 @@ def process_feed(feed: feeds.Feed, pubname: str, silent: bool):
             bump_skipped()
         else:
             entry.pop("summary_detail", "")
+            entry.pop("title_detail", "")
             entry.pop("guidislink", "")
             entry.pop("media_credit", "")
             entry["pubname"] = pubname
             entry["feedname"] = feedname
+            title = entry["title"]
+            category = "uncategorized"
+            if categorize:
+                print(f"Categorizing {title}")
+                try:
+                    category = classify_by_title(title)
+                    if not silent:
+                        print(f"title {title} classified as {category}")
+                except Exception as e:
+                    msg = f"Classifier exception on title {title}: {e}"
+                    if not silent:
+                        print(msg)
+                    if not no_logging:
+                        _logger.info(msg)
+            entry["cat"] = category
+            if not silent:
+                print(f"saving to category {entry['cat']}")
             dbif.save_article(entry)
             bump_added()
     if not silent:
         print(get_counts())
 
 
-def parse_pub(pub: feeds.Publication, silent: bool):
+def parse_pub(pub: feeds.Publication, silent: bool, no_logging: bool, categorize: bool):
     if not silent:
         print("\nPublication:", pub.name)
         print(20 * "*")
     for feed in pub.feeds:
-        process_feed(feed, pub.name, silent)
+        process_feed(feed, pub.name, silent, categorize, no_logging)
     if not silent:
         print(f"Done with pub {pub.name}\n")
         print(20 * "*")
 
 
-def process_pubs(xgroup: str | None, silent: bool, no_logging: bool):
+def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize: bool):
     """parse feed for pubs
 
     Args:
@@ -124,7 +148,7 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool):
         pubs = [pub for pub in pubs if pub.group != xgroup]
 
     for pub in pubs:
-        parse_pub(pub, silent)
+        parse_pub(pub, silent, categorize, no_logging)
     ndocs = dbif.get_article_count()
     msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
     if not silent:

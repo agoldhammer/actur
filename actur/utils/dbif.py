@@ -1,7 +1,7 @@
 import pendulum
 import pymongo
 from bson.json_util import dumps, RELAXED_JSON_OPTIONS
-from ..config import readconf as rc
+from actur.config import readconf as rc
 
 _host: str | None = None
 _client: pymongo.MongoClient
@@ -71,7 +71,7 @@ def find_articles_by_daterange(start, end):
     db = get_db()
     return db.articles.find(
         {"pubdate": {"$gte": start, "$lte": end}},
-        {"pubdate": 1, "pubname": 1, "summary": 1, "title": 1},
+        {"pubdate": 1, "pubname": 1, "summary": 1, "title": 1, "cat": 1},
     )
 
 
@@ -102,6 +102,7 @@ def get_articles_in_daterange(pubnames: list[str]):
             "link": 1,
             "published": 1,
             "published_parsed": 1,
+            "cat": 1,
         },
     ).sort("pubdate", 1)
 
@@ -110,5 +111,15 @@ def cursor_to_json(cursor):
     return dumps(cursor, json_options=RELAXED_JSON_OPTIONS)
 
 
+def test_for_cat():
+    db = get_db()
+    articles = db.articles.find()
+    for article in articles:
+        print(article.get("cat", "FAIL!"))
+
+
 # call on load to initialize db
 _init_db()
+
+if __name__ == "__main__":
+    test_for_cat()
