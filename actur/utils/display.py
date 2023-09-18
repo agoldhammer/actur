@@ -6,7 +6,7 @@ from .summary_parser import summary_parse
 def display_article(article, summary_flag: bool):
     print(f"{Fore.YELLOW}{article['pubname']}: {article['pubdate']}")
     print(article["title"])
-    print(f"Category: {article['cat']}")
+    print(f"Category: {article.get('cat', 'not categorized')}")
     # print(article)
     print(20 * "-")
     print(f"{Style.RESET_ALL}")
