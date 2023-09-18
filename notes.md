@@ -73,3 +73,7 @@ sudo touch /var/log/actu/reader-atlas.log
 sudo chown -R $(whoami) /var/log/actu/reader-atlas.log
 
 ```
+
+Copy sup-actur.conf to /etc/supervisor/conf.d actur.conf
+and restart supervisor supervisorctl start actur-atlas actur-local
+omit atlas if no longer being used
