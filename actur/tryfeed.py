@@ -18,7 +18,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         url = sys.argv[1]
     else:
-        url = "https://www.liberation.fr/arc/outboundfeeds/rss-all/?outputType=xml"
+        url = (
+            "https://www.ft.com/myft/following/126e6584-dcdf-4320-9a28-2c4a614e7c0c.rss"
+        )
     main(url)
 
 """
