@@ -72,6 +72,8 @@ actu read -x US
 sudo touch /var/log/actu/reader-atlas.log
 sudo chown -R $(whoami) /var/log/actu/reader-atlas.log
 
+For display to work, must export ACTUCONF=$HOME/.actur/local.toml
+
 ```
 
 Copy sup-actur.conf to /etc/supervisor/conf.d actur.conf
