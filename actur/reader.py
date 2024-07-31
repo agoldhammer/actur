@@ -112,7 +112,7 @@ def process_feed(
                     if not silent:
                         print(msg)
                     if not no_logging:
-                        _logger.info(msg)
+                        _logger.error(msg)
             entry["cat"] = category
             if not silent:
                 print(f"saving to category {entry['cat']}")
