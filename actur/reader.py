@@ -77,7 +77,7 @@ def process_feed(
     if not silent:
         print(f"+++\nFeed: {feedname}")
         print(20 * "_")
-        print("Version:", d.version)
+        # print("Version:", d.version)
         if d.bozo:
             print("XML is ill-formed")
         print("Status:", d.status)
