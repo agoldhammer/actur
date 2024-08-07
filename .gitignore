@@ -172,3 +172,6 @@ actur/utils/playground-1.mongodb.js
 
 .DS_Store
 actur.conf
+
+.actur-venv/
+
