@@ -40,7 +40,7 @@ def classify_by_title(title):
     )
     # print(f"Messages: {user_msg}")
     chat = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content": user_msg},
