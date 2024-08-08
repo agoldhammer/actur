@@ -102,11 +102,11 @@ def process_feed(
             title = entry["title"]
             category = "uncategorized"
             if categorize:
-                print(f"Categorizing {title}")
+                # print(f"Categorizing {title}")
                 try:
                     category = classify_by_title(title)
-                    if not silent:
-                        print(f"title {title} classified as {category}")
+                    # if not silent:
+                    #     print(f"title {title} classified as {category}")
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
                     if not silent:
