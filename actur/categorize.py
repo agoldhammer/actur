@@ -38,7 +38,7 @@ def classify_by_title(title):
             ". Reply should consist solely of category, without explanation.",
         ]
     )
-    print(f"Messages: {user_msg}")
+    # print(f"Messages: {user_msg}")
     chat = client.chat.completions.create(
         model="gpt-4o",
         messages=[
