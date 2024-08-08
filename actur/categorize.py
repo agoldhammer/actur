@@ -39,11 +39,10 @@ def classify_by_title(title):
             ". Reply should consist solely of category, without explanation.",
         ]
     )
-    if message:
-        messages.append(
-            {"role": "user", "content": message},
-        )
-        chat = client.completions.create(model="gpt-3.5-turbo", prompt=messages)
+    messages.append(
+        {"role": "user", "content": message},
+    )
+    chat = client.completions.create(model="gpt-3.5-turbo", messages=messages)
     reply = chat.choices[0].message.content  # type: ignore
     return reply
 
