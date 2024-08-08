@@ -43,7 +43,7 @@ def classify_by_title(title):
         messages.append(
             {"role": "user", "content": message},
         )
-        chat = client.completions.create(model="gpt-3.5-turbo", messages=messages)
+        chat = client.completions.create(model="gpt-3.5-turbo", prompt=messages)
     reply = chat.choices[0].message.content  # type: ignore
     return reply
 
