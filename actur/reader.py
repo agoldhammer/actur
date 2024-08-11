@@ -77,7 +77,7 @@ def process_feed(
     if not silent:
         print(f"+++\nFeed: {feedname}")
         print(20 * "_")
-        print("Version:", d.version)
+        # print("Version:", d.version)
         if d.bozo:
             print("XML is ill-formed")
         print("Status:", d.status)
@@ -102,17 +102,17 @@ def process_feed(
             title = entry["title"]
             category = "uncategorized"
             if categorize:
-                print(f"Categorizing {title}")
+                # print(f"Categorizing {title}")
                 try:
                     category = classify_by_title(title)
-                    if not silent:
-                        print(f"title {title} classified as {category}")
+                    # if not silent:
+                    #     print(f"title {title} classified as {category}")
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
                     if not silent:
                         print(msg)
                     if not no_logging:
-                        _logger.info(msg)
+                        _logger.error(msg)
             entry["cat"] = category
             if not silent:
                 print(f"saving to category {entry['cat']}")
@@ -148,7 +148,14 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize:
         pubs = [pub for pub in pubs if pub.group != xgroup]
 
     for pub in pubs:
-        parse_pub(pub, silent, categorize, no_logging)
+        try:
+            parse_pub(pub, silent, categorize, no_logging)
+        except Exception as e:
+            msg = f"Could not read {pub.name}: {e}"
+            if not silent:
+                print(msg)
+            if not no_logging:
+                _logger.error(msg)
     ndocs = dbif.get_article_count()
     msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
     if not silent:

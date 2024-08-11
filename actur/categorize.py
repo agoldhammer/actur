@@ -1,6 +1,6 @@
 import time
 
-import openai
+from openai import OpenAI
 
 from actur.config.readconf import get_conf_by_key
 from actur.utils.query import get_arts_in_daterange_from_pubs
@@ -23,9 +23,9 @@ from actur.utils.query import get_arts_in_daterange_from_pubs
 
 
 def classify_by_title(title):
-    openai.api_key = get_conf_by_key("openai")["secret_key"]
-    messages = [{"role": "system", "content": "You are an intelligent assistant."}]
-    message = " ".join(
+    # openai.api_key = get_conf_by_key("openai")["secret_key"]
+    client = OpenAI(api_key=get_conf_by_key("openai")["secret_key"])
+    user_msg = " ".join(
         [
             "Classify this text as",
             "French Politics, German Politics, Italian Politics, UK Politics,"
@@ -38,11 +38,14 @@ def classify_by_title(title):
             ". Reply should consist solely of category, without explanation.",
         ]
     )
-    if message:
-        messages.append(
-            {"role": "user", "content": message},
-        )
-        chat = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+    # print(f"Messages: {user_msg}")
+    chat = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant"},
+            {"role": "user", "content": user_msg},
+        ],
+    )
     reply = chat.choices[0].message.content  # type: ignore
     return reply
 

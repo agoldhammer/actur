@@ -79,3 +79,7 @@ For display to work, must export ACTUCONF=$HOME/.actur/local.toml
 Copy sup-actur.conf to /etc/supervisor/conf.d actur.conf
 and restart supervisor supervisorctl start actur-atlas actur-local
 omit atlas if no longer being used
+
+New openai interface:
+https://github.com/openai/openai-python/discussions/742
+discussion
