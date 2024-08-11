@@ -13,9 +13,6 @@
 
 pytest --cov=actur tests/
 
-## on git guardian and precommit hooks
-
-[https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit#:~:text=A%20pre%2Dcommit%20hook%20is,through%20our%20CLI%20application%3A%20ggshield%20.]
 
 ## proposed signal handler
 
@@ -64,22 +61,28 @@ See:
 
 ```bash
 mkdir -p ~/.actu
-# install config files atlas.toml, local.toml
+# install config files local.toml
 sudo mkdir -p /var/log/actu
 sudo touch /var/log/actu/reader-local.log
 sudo chown -R $(whoami) /var/log/actu/reader-local.log
 actu read -x US
-sudo touch /var/log/actu/reader-atlas.log
-sudo chown -R $(whoami) /var/log/actu/reader-atlas.log
+sudo touch /var/log/actu/reader-local.log
+sudo chown -R $(whoami) /var/log/actu/reader-local.log
 
-For display to work, must export ACTUCONF=$HOME/.actur/local.toml
+For display to work, must export ACTUCONF=$HOME/.actur/local.toml (this is now the default, so no need to specify explicitly)
 
 ```
 
-Copy sup-actur.conf to /etc/supervisor/conf.d actur.conf
-and restart supervisor supervisorctl start actur-atlas actur-local
-omit atlas if no longer being used
+Copy sup-actur.conf to /etc/supervisor/conf.d/actur.conf
+
+and restart supervisor supervisorctl start actur-local  [or start all if actuproxy being used]
 
 New openai interface:
+
 https://github.com/openai/openai-python/discussions/742
 discussion
+
+## commands
+actu read --categorize [--silent] [-d]
+
+actu show -h 3 all
