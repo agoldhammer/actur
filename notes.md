@@ -13,7 +13,6 @@
 
 pytest --cov=actur tests/
 
-
 ## proposed signal handler
 
 ```python
@@ -75,14 +74,14 @@ For display to work, must export ACTUCONF=$HOME/.actur/local.toml (this is now t
 
 Copy sup-actur.conf to /etc/supervisor/conf.d/actur.conf
 
-and restart supervisor supervisorctl start actur-local  [or start all if actuproxy being used]
+and restart supervisor supervisorctl start actur-local [or start all if actuproxy being used]
 
 New openai interface:
 
-https://github.com/openai/openai-python/discussions/742
-discussion
+discussion [https://github.com/openai/openai-python/discussions/742]
 
 ## commands
+
 actu read --categorize [--silent] [-d]
 
 actu show -h 3 all
