@@ -2,6 +2,18 @@ import pendulum
 import pymongo
 from bson.json_util import dumps, RELAXED_JSON_OPTIONS
 from actur.config import readconf as rc
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn=rc.get_conf_by_key("sentry")["dsn"],
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 
 _host: str | None = None
 _client: pymongo.MongoClient
@@ -37,8 +49,9 @@ def _init_db():
 
 
 def save_article(entry):
-    db = get_db()
-    db.articles.insert_one(entry)
+    with sentry_sdk.start_transaction(op="save_article"):
+        db = get_db()
+        db.articles.insert_one(entry)
 
 
 def get_article_count() -> int:
@@ -47,14 +60,15 @@ def get_article_count() -> int:
 
 
 def is_summary_in_db(target_hash, summary):
-    db = get_db()
-    articles_with_target_hash = db.articles.find({"hash": target_hash})
-    for article in articles_with_target_hash:
-        if article["summary"] == summary:
-            return True
-        else:
-            continue
-    return False
+    with sentry_sdk.start_transaction(op="is_summary_in_db"):
+        db = get_db()
+        articles_with_target_hash = db.articles.find({"hash": target_hash})
+        for article in articles_with_target_hash:
+            if article["summary"] == summary:
+                return True
+            else:
+                continue
+        return False
 
 
 def find_text(collname: str, search_text: str):

@@ -71,7 +71,8 @@ def process_feed(
     global _logger
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
-    print("feedname", feedname)
+    if not silent:
+        print("feedname", feedname)
     url = feed.url
     d = feedparser.parse(url)
     if not silent:
