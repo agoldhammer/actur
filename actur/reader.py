@@ -4,6 +4,7 @@ import os
 import time
 
 import feedparser
+import sentry_sdk
 
 from actur.config import readconf as rc
 from actur.utils import dbif, feeds, hasher
@@ -110,6 +111,7 @@ def process_feed(
                     #     print(f"title {title} classified as {category}")
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
+                    sentry_sdk.capture_message(msg)
                     if not silent:
                         print(msg)
                     if not no_logging:
@@ -153,6 +155,7 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize:
             parse_pub(pub, silent, categorize, no_logging)
         except Exception as e:
             msg = f"Could not read {pub.name}: {e}"
+            sentry_sdk.capture_message(msg)
             if not silent:
                 print(msg)
             if not no_logging:
