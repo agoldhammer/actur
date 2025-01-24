@@ -1,18 +1,20 @@
+from random import sample
 import pendulum
 import pymongo
 from bson.json_util import dumps, RELAXED_JSON_OPTIONS
 from actur.config import readconf as rc
 import sentry_sdk
 
+sentry_sample_rate = rc.get_conf_by_key("sentry")["sample_rate"]
 sentry_sdk.init(
     dsn=rc.get_conf_by_key("sentry")["dsn"],
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for tracing.
-    traces_sample_rate=0.5,
+    traces_sample_rate=sentry_sample_rate,
     # Set profiles_sample_rate to 1.0 to profile 100%
     # of sampled transactions.
     # We recommend adjusting this value in production.
-    profiles_sample_rate=0.5,
+    profiles_sample_rate=sentry_sample_rate,
 )
 
 _host: str | None = None
