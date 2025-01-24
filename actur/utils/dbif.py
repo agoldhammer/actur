@@ -1,4 +1,3 @@
-from random import sample
 import pendulum
 import pymongo
 from bson.json_util import dumps, RELAXED_JSON_OPTIONS
