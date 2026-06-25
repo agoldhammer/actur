@@ -7,22 +7,22 @@ license = "MIT"
 authors = [
     {name = "Art Goldhammer", email = "art.goldhammer@gmail.com"},
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "beautifulsoup4==4.12.3",
-    "click==8.1.7",
-    "colorama==0.4.6",
-    "feedparser==6.0.11",
-    "openai==1.43.0",
-    "pendulum==3.0.0",
-    "pymongo==4.8.0",
+    "beautifulsoup4>=4.15.0",
+    "click>=8.4.2",
+    "colorama>=0.4.6",
+    "feedparser>=6.0.12",
+    "openai>=2.44.0",
+    "pendulum>=3.2.0",
+    "pymongo>=4.17.0",
 ]
 
 [project.urls]
@@ -35,16 +35,16 @@ tryout = "actur.tryout:main"
 
 [dependency-groups]
 dev = [
-    "black==24.8.0",
-    "bump2version==1.0.1",
-    "coverage==7.6.1",
-    "pytest==8.3.2",
-    "sphinx==8.0.2",
-    "time-machine==2.15.0",
-    "tox==4.18.0",
-    "twine==5.1.1",
-    "watchdog==5.0.2",
-    "wheel==0.44.0",
+    "black>=26.5.1",
+    "bump2version>=1.0.1",
+    "coverage>=7.14.3",
+    "pytest>=9.1.1",
+    "sphinx>=9.1.0",
+    "time-machine>=3.2.0",
+    "tox>=4.56.1",
+    "twine>=6.2.0",
+    "watchdog>=6.0.0",
+    "wheel>=0.47.0",
 ]
 
 [build-system]
