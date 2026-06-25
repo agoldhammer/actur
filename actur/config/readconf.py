@@ -17,6 +17,7 @@ def _read_conf() -> None:
         conf_file_path = os.path.expanduser(conf_from_env)
     else:  # use default if no spec in env
         conf_file_path = os.path.expanduser(_default_conf_file_path)
+    print(f"Reading configuration from {conf_file_path}")
     with open(conf_file_path, "rb") as fp:
         _conf = tomllib.load(fp)
     feed_conf_path = os.path.expanduser(_conf["feedconfig"]["path"])
