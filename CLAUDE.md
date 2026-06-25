@@ -48,7 +48,7 @@ Most of `tests/` (`test_dbif.py`, `test_conf.py`, `test_query.py`) are **integra
 
 ## Things to watch for
 
-- `setup.py`'s `install_requires` only lists `Click`, even though the package hard-depends on `pymongo`, `feedparser`, `openai`, `pendulum`, `beautifulsoup4`, and `colorama`. `requirements.txt` (generated via `uv`, per recent commit history) is the practical source of truth for the full dependency set, not `setup.py`.
+- Packaging migrated from pip (`setup.py`/`setup.cfg`/`requirements*.txt`) to `uv`/`pyproject.toml`. Runtime deps (`click`, `pymongo`, `feedparser`, `openai`, `pendulum`, `beautifulsoup4`, `colorama`) live in `[project.dependencies]`; dev tools (`pytest`, `black`, `sphinx`, `twine`, `tox`, etc.) live in `[dependency-groups] dev`. Use `uv sync`, `uv run <tool>`, `uv lock`, `uv build`. A `.python-version` pins 3.11 since this sandbox's system Python (3.14) lacks a C compiler for source-only builds of packages like `time-machine`.
 - The `readnews` console-script entry point (`actur.reader:main`) is currently a no-op stub (`main()` is just `pass`) — actual feed-reading is invoked through `actu read`, not `readnews`.
-- `tox.ini`/`.travis.yml` target Python 3.6–3.8, but `setup.py` declares `python_requires=">=3.11"` and the code uses 3.11+ syntax (`tomllib`, PEP 604 unions) — the tox/travis configs are stale relative to the actual language version in use.
+- `tox.ini`/`.travis.yml` target Python 3.6–3.8, but `pyproject.toml` declares `requires-python = ">=3.11"` and the code uses 3.11+ syntax (`tomllib`, PEP 604 unions) — the tox/travis configs are stale relative to the actual language version in use.
 - `.pre-commit-config.yaml` has its only hook (ggshield) fully commented out, so no pre-commit hooks currently run.
