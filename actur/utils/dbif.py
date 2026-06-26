@@ -22,18 +22,21 @@ def get_db():
     return _client[_dbname]
 
 
-def _init_db():
+def init_db():
     global _host, _client, _dbname
-    if _host is None or _dbname is None:  # not yet initialized, so read conf
-        database = rc.get_conf_by_key("database")
-        _host = database["url"]
-        _dbname = database["dbname"]
-        _client = pymongo.MongoClient(_host)
-    db = get_db()
-    db.articles.create_index("hash")
-    db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
-    db.articles.create_index([("summary", pymongo.TEXT)], background=True)
-    db.articles.create_index("pubname", background=True)
+    try:
+        if _host is None or _dbname is None:  # not yet initialized, so read conf
+            database = rc.get_conf_by_key("database")
+            _host = database["url"]
+            _dbname = database["dbname"]
+            _client = pymongo.MongoClient(_host)
+        db = get_db()
+        db.articles.create_index("hash")
+        db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
+        db.articles.create_index([("summary", pymongo.TEXT)], background=True)
+        db.articles.create_index("pubname", background=True)
+    except Exception as e:
+        raise ActuDBError(f"Error initializing database: {e}")
 
 
 def save_article(entry):
@@ -119,7 +122,7 @@ def test_for_cat():
 
 
 # call on load to initialize db
-_init_db()
+# _init_db()
 
 if __name__ == "__main__":
     test_for_cat()

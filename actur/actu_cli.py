@@ -3,15 +3,20 @@ from time import sleep
 
 import click
 
+from actur.config import read_conf
 from actur.utils import display, feeds, query
+from actur.utils.dbif import init_db
 from actur import reader
 
 
 @click.group()
 def cli():
-    # click.echo("actu Newsreader")
-    pass
-
+    try:
+        read_conf()
+        init_db()
+    except Exception as e:
+        print(f"Error initializing actu: {e}")
+        sys.exit(1)
 
 @cli.command()
 @click.option("--start", "-s", help="start date")
