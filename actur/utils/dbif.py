@@ -81,7 +81,8 @@ async def make_tempdb_from_daterange(start, end):
         {"$match": {"pubdate": {"$gte": start, "$lte": end}}},
         {"$out": "daterange"},
     ]
-    await db.articles.aggregate(pipeline).to_list(length=None)
+    cursor = await db.articles.aggregate(pipeline)
+    await cursor.to_list(length=None)
     await db.daterange.create_index([("pubdate", pymongo.DESCENDING)])
     await db.daterange.create_index([("summary", pymongo.TEXT)])
 
