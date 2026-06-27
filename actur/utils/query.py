@@ -45,7 +45,7 @@ def calc_time_range(
     return None, start_dt, end_dt
 
 
-def create_temp_daterange(
+async def create_temp_daterange(
     start: str | None, end: str | None, days: int | None, hours: int | None
 ):
     errmsg = None
@@ -58,10 +58,10 @@ def create_temp_daterange(
         print(f"Error: {errmsg}\n")
     else:
         print(f"New date range: {start_dt} to {end_dt}\n")
-        dbif.make_tempdb_from_daterange(start_dt, end_dt)
+        await dbif.make_tempdb_from_daterange(start_dt, end_dt)
 
 
-def get_arts_in_daterange_from_pubs(
+async def get_arts_in_daterange_from_pubs(
     pubnames: list[str],
     start: str | None,
     end: str | None,
@@ -69,14 +69,13 @@ def get_arts_in_daterange_from_pubs(
     hours: int | None,
     group: str | None = None,
 ):
-    create_temp_daterange(start, end, days, hours)
+    await create_temp_daterange(start, end, days, hours)
 
     if "all" in pubnames:
         pubnames = [pub.name for pub in feeds.get_publications()]
     if group is not None:
         pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
-    articles = dbif.get_articles_in_daterange(pubnames)
-    return articles
+    return dbif.get_articles_in_daterange(pubnames)
 
 
 def main():

@@ -14,7 +14,6 @@ from actur import reader
 def cli():
     try:
         read_conf()
-        init_db()
     except Exception as e:
         print(f"Error initializing actu: {e}")
         sys.exit(1)
@@ -50,10 +49,17 @@ def show(
             print(20 * "=")
         return 0
     # select articles
-    articles = query.get_arts_in_daterange_from_pubs(
-        pubnames, start, end, days, hours, group
-    )
-    display.display_articles(articles, summary_flag=summary)
+    async def _fetch_and_display():
+        await init_db()
+        articles = await query.get_arts_in_daterange_from_pubs(
+            pubnames, start, end, days, hours, group
+        )
+        await display.display_articles(articles, summary_flag=summary)
+
+    try:
+        asyncio.run(_fetch_and_display())
+    except Exception as e:
+        print(f"Error showing articles: {e}")
 
     return 0
 
@@ -80,6 +86,7 @@ def read(
         reader.setup_logging()
 
         async def run():
+            await init_db()
             while True:
                 await reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
                 if daemon:

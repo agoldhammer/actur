@@ -32,6 +32,6 @@ def display_article(article, summary_flag: bool):
     print(20 * "-")
 
 
-def display_articles(cursor, summary_flag: bool):
-    for article in cursor:
+async def display_articles(cursor, summary_flag: bool):
+    async for article in cursor:
         display_article(article, summary_flag)

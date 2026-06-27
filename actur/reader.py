@@ -88,7 +88,7 @@ async def process_feed(
         entry["pubdate"] = dt
         ehash = hasher.ag_hash(entry.summary)
         entry["hash"] = ehash
-        already_in = await asyncio.to_thread(dbif.is_summary_in_db, ehash, entry.summary)
+        already_in = await dbif.is_summary_in_db(ehash, entry.summary)
         if already_in:
             bump_skipped()
         else:
@@ -115,7 +115,7 @@ async def process_feed(
             else:
                 if not silent:
                     lines.append(f"saving to category {entry['cat']}")
-                await asyncio.to_thread(dbif.save_article, entry)
+                await dbif.save_article(entry)
             bump_added()
     if not silent:
         lines.append(get_counts())
@@ -176,7 +176,7 @@ async def process_pubs(
     for pub in pubs:
         await safe_parse_pub(pub)
 
-    ndocs = await asyncio.to_thread(dbif.get_article_count)
+    ndocs = await dbif.get_article_count()
     msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
     if not silent:
         print(msg)
