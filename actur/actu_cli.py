@@ -89,8 +89,12 @@ def read(
             while True:
                 await reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
                 if daemon:
+                    if not silent:
+                        print(f"Sleeping for {sleeptime} seconds...")
                     await asyncio.sleep(sleeptime)
                 else:
+                    if not silent:
+                        print("Exiting...")
                     break
 
         asyncio.run(run())
