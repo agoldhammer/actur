@@ -111,7 +111,7 @@ async def process_feed(
                         _logger.error(msg)
             entry["cat"] = category
             if no_store:
-                print(f"Would have stored: {dict(entry)}")
+                print(f"Would have stored title: {entry.title}")
             else:
                 if not silent:
                     print(f"saving to category {entry['cat']}")
