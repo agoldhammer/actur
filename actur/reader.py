@@ -67,21 +67,21 @@ async def process_feed(
     no_logging: bool,
     categorize: bool,
     no_store: bool = False,
-):
-    """Fetch, parse, and store one feed; runs concurrently with other feeds."""
+) -> list[str]:
+    """Fetch, parse, and store one feed; returns buffered output lines."""
     global _logger
+    lines: list[str] = []
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
-    print("feedname", feedname)
     url = feed.url
     d = await asyncio.to_thread(feedparser.parse, url)
     if not silent:
-        print(f"+++\nFeed: {feedname}")
-        print(20 * "_")
+        lines.append(f"+++\nFeed: {feedname}")
+        lines.append(20 * "_")
         if d.bozo:
-            print("XML is ill-formed")
-        print("Status:", d.status)
-        print("no. entries", len(d.entries))
+            lines.append("XML is ill-formed")
+        lines.append(f"Status: {d.status}")
+        lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
         bump_processed()
         dt = datetime.datetime(*entry.published_parsed[:6])
@@ -106,19 +106,20 @@ async def process_feed(
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
                     if not silent:
-                        print(msg)
+                        lines.append(msg)
                     if not no_logging:
                         _logger.error(msg)
             entry["cat"] = category
             if no_store:
-                print(f"Would have stored title: {entry.title}")
+                lines.append(f"Would have stored title: {entry.title}")
             else:
                 if not silent:
-                    print(f"saving to category {entry['cat']}")
+                    lines.append(f"saving to category {entry['cat']}")
                 await asyncio.to_thread(dbif.save_article, entry)
             bump_added()
     if not silent:
-        print(get_counts())
+        lines.append(get_counts())
+    return lines
 
 
 async def parse_pub(
@@ -131,10 +132,13 @@ async def parse_pub(
     if not silent:
         print("\nPublication:", pub.name)
         print(20 * "*")
-    await asyncio.gather(*[
+    feed_outputs = await asyncio.gather(*[
         process_feed(feed, pub.name, silent, no_logging, categorize, no_store)
         for feed in pub.feeds
     ])
+    for feed_lines in feed_outputs:
+        for line in feed_lines:
+            print(line)
     if not silent:
         print(f"Done with pub {pub.name}\n")
         print(20 * "*")
@@ -169,7 +173,8 @@ async def process_pubs(
             if not no_logging:
                 _logger.error(msg)
 
-    await asyncio.gather(*[safe_parse_pub(pub) for pub in pubs])
+    for pub in pubs:
+        await safe_parse_pub(pub)
 
     ndocs = await asyncio.to_thread(dbif.get_article_count)
     msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
