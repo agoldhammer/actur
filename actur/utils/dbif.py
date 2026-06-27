@@ -1,5 +1,6 @@
 import pendulum
 import pymongo
+import sentry_sdk
 from bson.json_util import RELAXED_JSON_OPTIONS, dumps
 from pymongo import AsyncMongoClient
 
@@ -31,6 +32,12 @@ async def init_db():
             _host = database["url"]
             _dbname = database["dbname"]
             _client = AsyncMongoClient(_host)
+            sentry_conf = rc.get_conf_by_key("sentry")
+            sentry_sdk.init(
+                dsn=sentry_conf["dsn"],
+                traces_sample_rate=sentry_conf["sample_rate"],
+                profiles_sample_rate=sentry_conf["sample_rate"],
+            )
         db = get_db()
         await db.articles.create_index("hash")
         await db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
