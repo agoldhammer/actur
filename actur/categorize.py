@@ -4,6 +4,7 @@ import time
 from openai import AsyncOpenAI
 
 from actur.config.readconf import get_conf_by_key
+from actur.utils.dbif import init_db
 from actur.utils.query import get_arts_in_daterange_from_pubs
 
 
@@ -35,10 +36,11 @@ async def classify_by_title(title):
 
 def main():
     async def _main():
+        await init_db()
         count = 0
         tot_tokens = 0
-        arts = get_arts_in_daterange_from_pubs(["all"], None, None, None, 2, None)
-        for art in arts:
+        arts = await get_arts_in_daterange_from_pubs(["all"], None, None, None, 2, None)
+        async for art in arts:
             count += 1
             print(f"Message {count}")
             title = art["title"]
