@@ -80,7 +80,6 @@ async def process_feed(
         lines.append(20 * "_")
         if d.bozo:
             lines.append("XML is ill-formed")
-        lines.append(f"Status: {d.status}")
         lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
         bump_processed()
@@ -114,7 +113,7 @@ async def process_feed(
                 lines.append(f"Would have stored title: {entry.title}")
             else:
                 if not silent:
-                    lines.append(f"saving to category {entry['cat']}")
+                    lines.append(f"saving *{entry['title']}* to category {entry['cat']}")
                 await dbif.save_article(entry)
             bump_added()
     if not silent:
