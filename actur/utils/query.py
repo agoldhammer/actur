@@ -42,7 +42,7 @@ def calc_time_range(
         end_dt = pd.now().in_timezone("UTC")
     else:
         end_dt = pa.parse(end)
-    return None, start_dt, end_dt
+    return None, start_dt, end_dt # type: ignore
 
 
 async def create_temp_daterange(
@@ -51,7 +51,7 @@ async def create_temp_daterange(
     errmsg = None
     try:
         errmsg, start_dt, end_dt = calc_time_range(start, end, days, hours)
-    except pa.exceptions.ParserError as exc:
+    except pa.exceptions.ParserError as exc: # type: ignore
         print(f"Error parsing date: {exc}\n")
         sys.exit(255)
     if errmsg is not None:
@@ -77,19 +77,3 @@ async def get_arts_in_daterange_from_pubs(
         pubnames = [pub.name for pub in feeds.get_publications() if pub.group == group]
     return dbif.get_articles_in_daterange(pubnames)
 
-
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    # dbif.init_db()
-    # should return an error
-    create_temp_daterange(start="2023-07-16", end=None, days=1, hours=1)
-    create_temp_daterange("2023-07-16", "2023-07-17", None, None)
-    create_temp_daterange(None, None, days=1, hours=None)
-    create_temp_daterange(None, None, days=None, hours=1)
-    create_temp_daterange(None, "2027-07-17", None, None)
-    create_temp_daterange(start="2023-07-16T00:00", end=None, days=None, hours=None)
-    # create_temp_daterange(start=None, end=None, days=1, hours=None)
-    main()

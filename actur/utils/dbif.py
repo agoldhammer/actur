@@ -1,7 +1,8 @@
 import pendulum
 import pymongo
+from bson.json_util import RELAXED_JSON_OPTIONS, dumps
 from pymongo import AsyncMongoClient
-from bson.json_util import dumps, RELAXED_JSON_OPTIONS
+
 from actur.config import readconf as rc
 
 _host: str | None = None
@@ -19,7 +20,7 @@ def get_db():
     global _client, _dbname
     if _dbname is None:
         raise ActuDBError("DB name not defined. Must call init_db first.")
-    return _client[_dbname]
+    return _client[_dbname] # type: ignore
 
 
 async def init_db():

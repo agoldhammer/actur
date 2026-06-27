@@ -6,9 +6,9 @@ import time
 
 import feedparser
 
+from actur.categorize import classify_by_title
 from actur.config import readconf as rc
 from actur.utils import dbif, feeds, hasher
-from actur.categorize import classify_by_title
 
 _total_processed: int = 0
 _total_added: int = 0
@@ -83,9 +83,9 @@ async def process_feed(
         lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
         bump_processed()
-        dt = datetime.datetime(*entry.published_parsed[:6])
+        dt = datetime.datetime(*entry.published_parsed[:6]) # pyright: ignore[reportArgumentType]
         entry["pubdate"] = dt
-        ehash = hasher.ag_hash(entry.summary)
+        ehash = hasher.ag_hash(entry.summary) # pyright: ignore[reportArgumentType]
         entry["hash"] = ehash
         already_in = await dbif.is_summary_in_db(ehash, entry.summary)
         if already_in:

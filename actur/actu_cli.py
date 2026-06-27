@@ -3,10 +3,10 @@ import sys
 
 import click
 
+from actur import reader
 from actur.config import read_conf
 from actur.utils import display, feeds, query
 from actur.utils.dbif import init_db
-from actur import reader
 
 
 @click.group()
@@ -49,7 +49,7 @@ def show(
         return 0
     # select articles
     async def _fetch_and_display():
-        await init_db()
+        await init_db() # type: ignore
         articles = await query.get_arts_in_daterange_from_pubs(
             pubnames, start, end, days, hours, group
         )
