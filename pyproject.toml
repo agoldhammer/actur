@@ -22,7 +22,6 @@ dependencies = [
     "feedparser>=6.0.12",
     "openai>=2.44.0",
     "pendulum>=3.2.0",
-    "motor>=3.7.0",
     "pymongo>=4.17.0",
 ]
 

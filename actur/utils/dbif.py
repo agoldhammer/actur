@@ -1,11 +1,11 @@
 import pendulum
 import pymongo
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 from bson.json_util import dumps, RELAXED_JSON_OPTIONS
 from actur.config import readconf as rc
 
 _host: str | None = None
-_client: AsyncIOMotorClient | None = None
+_client: AsyncMongoClient | None = None
 _dbname: str | None = None
 
 
@@ -29,7 +29,7 @@ async def init_db():
             database = rc.get_conf_by_key("database")
             _host = database["url"]
             _dbname = database["dbname"]
-            _client = AsyncIOMotorClient(_host)
+            _client = AsyncMongoClient(_host)
         db = get_db()
         await db.articles.create_index("hash")
         await db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
