@@ -60,7 +60,7 @@ def pcounters():
 
 
 def process_feed(
-    feed: feeds.Feed, pubname: str, silent: bool, no_logging: bool, categorize: bool
+    feed: feeds.Feed, pubname: str, silent: bool, no_logging: bool, categorize: bool, no_store: bool = False
 ):
     """read, parse, and store one feed
 
@@ -114,26 +114,29 @@ def process_feed(
                     if not no_logging:
                         _logger.error(msg)
             entry["cat"] = category
-            if not silent:
-                print(f"saving to category {entry['cat']}")
-            dbif.save_article(entry)
+            if no_store:
+                print(f"Would have stored: {dict(entry)}")
+            else:
+                if not silent:
+                    print(f"saving to category {entry['cat']}")
+                dbif.save_article(entry)
             bump_added()
     if not silent:
         print(get_counts())
 
 
-def parse_pub(pub: feeds.Publication, silent: bool, no_logging: bool, categorize: bool):
+def parse_pub(pub: feeds.Publication, silent: bool, no_logging: bool, categorize: bool, no_store: bool = False):
     if not silent:
         print("\nPublication:", pub.name)
         print(20 * "*")
     for feed in pub.feeds:
-        process_feed(feed, pub.name, silent, categorize, no_logging)
+        process_feed(feed, pub.name, silent, categorize, no_logging, no_store)
     if not silent:
         print(f"Done with pub {pub.name}\n")
         print(20 * "*")
 
 
-def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize: bool):
+def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize: bool, no_store: bool = False):
     """parse feed for pubs
 
     Args:
@@ -149,7 +152,7 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize:
 
     for pub in pubs:
         try:
-            parse_pub(pub, silent, categorize, no_logging)
+            parse_pub(pub, silent, categorize, no_logging, no_store)
         except Exception as e:
             msg = f"Could not read {pub.name}: {e}"
             if not silent:
