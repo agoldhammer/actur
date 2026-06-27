@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from time import sleep
 
@@ -77,12 +78,16 @@ def read(
     """Check news feeds for new articles"""
     try:
         reader.setup_logging()
-        while True:
-            reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
-            if daemon:
-                sleep(sleeptime)
-            else:
-                break
+
+        async def run():
+            while True:
+                await reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
+                if daemon:
+                    await asyncio.sleep(sleeptime)
+                else:
+                    break
+
+        asyncio.run(run())
     except Exception as e:
         print(f"Could not read feeds: {e}")
 

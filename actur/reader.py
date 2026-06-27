@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 import os
@@ -59,37 +60,35 @@ def pcounters():
     return bump_processed, bump_added, bump_skipped, counts2str
 
 
-def process_feed(
-    feed: feeds.Feed, pubname: str, silent: bool, no_logging: bool, categorize: bool, no_store: bool = False
+async def process_feed(
+    feed: feeds.Feed,
+    pubname: str,
+    silent: bool,
+    no_logging: bool,
+    categorize: bool,
+    no_store: bool = False,
 ):
-    """read, parse, and store one feed
-
-    Args:
-        feed (feeds.Feed): a Feed descriptor
-        pubname (str): publication generating feed
-    """
+    """Fetch, parse, and store one feed; runs concurrently with other feeds."""
     global _logger
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
     print("feedname", feedname)
     url = feed.url
-    d = feedparser.parse(url)
+    d = await asyncio.to_thread(feedparser.parse, url)
     if not silent:
         print(f"+++\nFeed: {feedname}")
         print(20 * "_")
-        # print("Version:", d.version)
         if d.bozo:
             print("XML is ill-formed")
         print("Status:", d.status)
         print("no. entries", len(d.entries))
     for entry in d.entries:
-        # print(f"Processing {entry.title}")
         bump_processed()
         dt = datetime.datetime(*entry.published_parsed[:6])
         entry["pubdate"] = dt
         ehash = hasher.ag_hash(entry.summary)
         entry["hash"] = ehash
-        already_in = dbif.is_summary_in_db(ehash, entry.summary)
+        already_in = await asyncio.to_thread(dbif.is_summary_in_db, ehash, entry.summary)
         if already_in:
             bump_skipped()
         else:
@@ -102,11 +101,8 @@ def process_feed(
             title = entry["title"]
             category = "uncategorized"
             if categorize:
-                # print(f"Categorizing {title}")
                 try:
-                    category = classify_by_title(title)
-                    # if not silent:
-                    #     print(f"title {title} classified as {category}")
+                    category = await classify_by_title(title)
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
                     if not silent:
@@ -115,51 +111,67 @@ def process_feed(
                         _logger.error(msg)
             entry["cat"] = category
             if no_store:
-                print(f"Would have stored title: {entry.title}")
+                print(f"Would have stored: {dict(entry)}")
             else:
                 if not silent:
                     print(f"saving to category {entry['cat']}")
-                dbif.save_article(entry)
+                await asyncio.to_thread(dbif.save_article, entry)
             bump_added()
     if not silent:
         print(get_counts())
 
 
-def parse_pub(pub: feeds.Publication, silent: bool, no_logging: bool, categorize: bool, no_store: bool = False):
+async def parse_pub(
+    pub: feeds.Publication,
+    silent: bool,
+    no_logging: bool,
+    categorize: bool,
+    no_store: bool = False,
+):
     if not silent:
         print("\nPublication:", pub.name)
         print(20 * "*")
-    for feed in pub.feeds:
-        process_feed(feed, pub.name, silent, categorize, no_logging, no_store)
+    await asyncio.gather(*[
+        process_feed(feed, pub.name, silent, no_logging, categorize, no_store)
+        for feed in pub.feeds
+    ])
     if not silent:
         print(f"Done with pub {pub.name}\n")
         print(20 * "*")
 
 
-def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize: bool, no_store: bool = False):
-    """parse feed for pubs
+async def process_pubs(
+    xgroup: str | None,
+    silent: bool,
+    no_logging: bool,
+    categorize: bool,
+    no_store: bool = False,
+):
+    """Fetch all publications concurrently.
 
     Args:
-        xgroup (str | None): if group specified, exclude from read_
+        xgroup (str | None): if specified, exclude this group from the read
     """
     global _total_added, _total_processed, _total_skipped, _logger
     _total_added = _total_processed = _total_skipped = 0
-    msg = ""
 
     pubs = feeds.get_publications()
     if xgroup is not None:
         pubs = [pub for pub in pubs if pub.group != xgroup]
 
-    for pub in pubs:
+    async def safe_parse_pub(pub):
         try:
-            parse_pub(pub, silent, categorize, no_logging, no_store)
+            await parse_pub(pub, silent, no_logging, categorize, no_store)
         except Exception as e:
             msg = f"Could not read {pub.name}: {e}"
             if not silent:
                 print(msg)
             if not no_logging:
                 _logger.error(msg)
-    ndocs = dbif.get_article_count()
+
+    await asyncio.gather(*[safe_parse_pub(pub) for pub in pubs])
+
+    ndocs = await asyncio.to_thread(dbif.get_article_count)
     msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
     if not silent:
         print(msg)
@@ -168,7 +180,6 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize:
 
 
 def main():
-    # process_pubs(None)
     pass
 
 
