@@ -85,8 +85,9 @@ async def process_feed(
         lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
         bump_processed()
-        dt = datetime.datetime(*entry.published_parsed[:6]) # pyright: ignore[reportArgumentType]
-        entry["pubdate"] = dt
+        if entry.published_parsed:
+            dt = datetime.datetime(*entry.published_parsed[:6]) # pyright: ignore[reportArgumentType]
+            entry["pubdate"] = dt
         ehash = hasher.ag_hash(entry.summary) # pyright: ignore[reportArgumentType]
         entry["hash"] = ehash
         already_in = await dbif.is_summary_in_db(ehash, entry.summary)
