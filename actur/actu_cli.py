@@ -3,7 +3,7 @@ import sys
 
 import click
 
-from actur import reader
+from actur import fix_uncategorized, reader
 from actur.config import read_conf
 from actur.utils import display, feeds, query
 from actur.utils.dbif import init_db
@@ -100,6 +100,22 @@ def read(
         asyncio.run(run())
     except Exception as e:
         print(f"Could not read feeds: {e}")
+
+
+@cli.command("fix-uncategorized")
+@click.option("--dry-run", is_flag=True, help="Preview without writing to database")
+def fix_uncategorized_cmd(dry_run: bool):
+    """Classify articles stored as 'uncategorized' or missing a category"""
+    async def _run():
+        await init_db()
+        fixed, failed = await fix_uncategorized.fix_uncategorized(dry_run=dry_run)
+        label = "[dry-run] " if dry_run else ""
+        print(f"{label}Done. Fixed: {fixed}, Failed: {failed}")
+
+    try:
+        asyncio.run(_run())
+    except Exception as e:
+        print(f"Error fixing uncategorized articles: {e}")
 
 
 if __name__ == "__main__":

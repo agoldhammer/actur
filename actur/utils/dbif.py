@@ -120,6 +120,19 @@ def cursor_to_json(cursor):
     return dumps(cursor, json_options=RELAXED_JSON_OPTIONS)
 
 
+def get_uncategorized_articles():
+    db = get_db()
+    return db.articles.find(
+        {"$or": [{"cat": {"$exists": False}}, {"cat": "uncategorized"}]},
+        {"_id": 1, "title": 1},
+    )
+
+
+async def update_article_cat(article_id, category: str):
+    db = get_db()
+    await db.articles.update_one({"_id": article_id}, {"$set": {"cat": category}})
+
+
 async def test_for_cat():
     db = get_db()
     async for article in db.articles.find():
