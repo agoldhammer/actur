@@ -43,7 +43,6 @@ def show(
         return 0
     # select articles
     async def _fetch_and_display():
-        await dbif.init_db()
         articles = await query.get_arts_in_daterange_from_pubs(
             pubnames, start, end, days, hours, group
         )
@@ -79,7 +78,7 @@ def read(
         reader.setup_logging()
 
         async def run():
-            await dbif.init_db()
+            await dbif.ensure_indexes()
             while True:
                 await reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
                 if daemon:
@@ -101,7 +100,6 @@ def read(
 def fix_uncategorized_cmd(dry_run: bool):
     """Classify articles stored as 'uncategorized' or missing a category"""
     async def _run():
-        await dbif.init_db()
         fixed, failed = await fix_uncategorized.fix_uncategorized(dry_run=dry_run)
         label = "[dry-run] " if dry_run else ""
         print(f"{label}Done. Fixed: {fixed}, Failed: {failed}")

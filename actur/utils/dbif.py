@@ -24,27 +24,29 @@ def get_db():
     return _client[_dbname] # type: ignore
 
 
-async def init_db():
+def init_db():
     global _host, _client, _dbname
     try:
-        if _host is None or _dbname is None:
-            database = rc.get_conf_by_key("database")
-            _host = database["url"]
-            _dbname = database["dbname"]
-            _client = AsyncMongoClient(_host)
-            sentry_conf = rc.get_conf_by_key("sentry")
-            sentry_sdk.init(
-                dsn=sentry_conf["dsn"],
-                traces_sample_rate=sentry_conf["sample_rate"],
-                profiles_sample_rate=sentry_conf["sample_rate"],
-            )
-        db = get_db()
-        await db.articles.create_index("hash")
-        await db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
-        await db.articles.create_index([("summary", pymongo.TEXT)], background=True)
-        await db.articles.create_index("pubname", background=True)
+        database = rc.get_conf_by_key("database")
+        _host = database["url"]
+        _dbname = database["dbname"]
+        _client = AsyncMongoClient(_host)
+        sentry_conf = rc.get_conf_by_key("sentry")
+        sentry_sdk.init(
+            dsn=sentry_conf["dsn"],
+            traces_sample_rate=sentry_conf["sample_rate"],
+            profiles_sample_rate=sentry_conf["sample_rate"],
+        )
     except Exception as e:
         raise ActuDBError(f"Error initializing database: {e}")
+
+
+async def ensure_indexes():
+    db = get_db()
+    await db.articles.create_index("hash")
+    await db.articles.create_index([("pubdate", pymongo.DESCENDING)], background=True)
+    await db.articles.create_index([("summary", pymongo.TEXT)], background=True)
+    await db.articles.create_index("pubname", background=True)
 
 
 async def save_article(entry):
