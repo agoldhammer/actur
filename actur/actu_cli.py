@@ -47,7 +47,7 @@ def show(
         articles = await query.get_arts_in_daterange_from_pubs(
             pubnames, start, end, days, hours, group
         )
-        display.display_articles(articles, summary_flag=summary)
+        await display.display_articles(articles, summary_flag=summary)
 
     try:
         asyncio.run(_fetch_and_display())

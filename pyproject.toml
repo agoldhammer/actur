@@ -30,7 +30,7 @@ dependencies = [
 Homepage = "https://github.com/agoldhammer/actur"
 
 [project.scripts]
-actu = "actur.actu_cli:cli"
+actu = "actur.actu_cli:main"
 readnews = "actur.reader:main"
 tryout = "actur.tryout:main"
 
