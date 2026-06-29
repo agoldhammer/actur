@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 import os
@@ -5,9 +6,9 @@ import time
 
 import feedparser
 
-from actur.config import readconf as rc
-from actur.utils import dbif, feeds, hasher
 from actur.categorize import classify_by_title
+from actur.config import readconf as rc
+from actur.utils import dbif, feeds, hasher, sentry_helper
 
 _total_processed: int = 0
 _total_added: int = 0
@@ -59,37 +60,36 @@ def pcounters():
     return bump_processed, bump_added, bump_skipped, counts2str
 
 
-def process_feed(
-    feed: feeds.Feed, pubname: str, silent: bool, no_logging: bool, categorize: bool
-):
-    """read, parse, and store one feed
-
-    Args:
-        feed (feeds.Feed): a Feed descriptor
-        pubname (str): publication generating feed
-    """
+async def process_feed(
+    feed: feeds.Feed,
+    pubname: str,
+    silent: bool,
+    no_logging: bool,
+    categorize: bool,
+    no_store: bool = False,
+) -> list[str]:
+    """Fetch, parse, and store one feed; returns buffered output lines."""
     global _logger
+    lines: list[str] = []
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
-    print("feedname", feedname)
     url = feed.url
-    d = feedparser.parse(url)
+    d = await asyncio.to_thread(feedparser.parse, url)
     if not silent:
-        print(f"+++\nFeed: {feedname}")
-        print(20 * "_")
-        # print("Version:", d.version)
+        lines.append(f"+++\nFeed: {feedname}")
+        lines.append(20 * "_")
         if d.bozo:
-            print("XML is ill-formed")
-        print("Status:", d.status)
-        print("no. entries", len(d.entries))
+            lines.append(f"XML is ill-formed in feed: {feedname}")
+            sentry_helper.sentry_output(f"XML is ill-formed in feed: {feedname}")
+        lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
-        # print(f"Processing {entry.title}")
         bump_processed()
-        dt = datetime.datetime(*entry.published_parsed[:6])
-        entry["pubdate"] = dt
-        ehash = hasher.ag_hash(entry.summary)
+        if entry.published_parsed:
+            dt = datetime.datetime(*entry.published_parsed[:6]) # pyright: ignore[reportArgumentType]
+            entry["pubdate"] = dt
+        ehash = hasher.ag_hash(entry.summary) # pyright: ignore[reportArgumentType]
         entry["hash"] = ehash
-        already_in = dbif.is_summary_in_db(ehash, entry.summary)
+        already_in = await dbif.is_summary_in_db(ehash, entry.summary)
         if already_in:
             bump_skipped()
         else:
@@ -102,61 +102,84 @@ def process_feed(
             title = entry["title"]
             category = "uncategorized"
             if categorize:
-                # print(f"Categorizing {title}")
                 try:
-                    category = classify_by_title(title)
-                    # if not silent:
-                    #     print(f"title {title} classified as {category}")
+                    category = await classify_by_title(title)
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
+                    sentry_helper.sentry_output(msg)
                     if not silent:
-                        print(msg)
+                        lines.append(msg)
                     if not no_logging:
                         _logger.error(msg)
             entry["cat"] = category
-            if not silent:
-                print(f"saving to category {entry['cat']}")
-            dbif.save_article(entry)
+            if no_store:
+                lines.append(f"Would have stored title: {entry.title} in category {entry.cat}")
+            else:
+                if not silent:
+                    lines.append(f"saving *{entry['title']}* to category {entry['cat']}")
+                await dbif.save_article(entry)
             bump_added()
     if not silent:
-        print(get_counts())
+        lines.append(get_counts())
+    return lines
 
 
-def parse_pub(pub: feeds.Publication, silent: bool, no_logging: bool, categorize: bool):
+async def parse_pub(
+    pub: feeds.Publication,
+    silent: bool,
+    no_logging: bool,
+    categorize: bool,
+    no_store: bool = False,
+):
     if not silent:
         print("\nPublication:", pub.name)
         print(20 * "*")
-    for feed in pub.feeds:
-        process_feed(feed, pub.name, silent, categorize, no_logging)
+    feed_outputs = await asyncio.gather(*[
+        process_feed(feed, pub.name, silent, no_logging, categorize, no_store)
+        for feed in pub.feeds
+    ])
+    for feed_lines in feed_outputs:
+        for line in feed_lines:
+            print(line)
     if not silent:
         print(f"Done with pub {pub.name}\n")
         print(20 * "*")
 
 
-def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize: bool):
-    """parse feed for pubs
+async def process_pubs(
+    xgroup: str | None,
+    silent: bool,
+    no_logging: bool,
+    categorize: bool,
+    no_store: bool = False,
+):
+    """Fetch all publications concurrently.
 
     Args:
-        xgroup (str | None): if group specified, exclude from read_
+        xgroup (str | None): if specified, exclude this group from the read
     """
     global _total_added, _total_processed, _total_skipped, _logger
     _total_added = _total_processed = _total_skipped = 0
-    msg = ""
 
     pubs = feeds.get_publications()
     if xgroup is not None:
         pubs = [pub for pub in pubs if pub.group != xgroup]
 
-    for pub in pubs:
+    async def safe_parse_pub(pub):
         try:
-            parse_pub(pub, silent, categorize, no_logging)
+            await parse_pub(pub, silent, no_logging, categorize, no_store)
         except Exception as e:
             msg = f"Could not read {pub.name}: {e}"
+            sentry_helper.sentry_output(msg)
             if not silent:
                 print(msg)
             if not no_logging:
                 _logger.error(msg)
-    ndocs = dbif.get_article_count()
+
+    for pub in pubs:
+        await safe_parse_pub(pub)
+
+    ndocs = await dbif.get_article_count()
     msg = f"Tot: {_total_processed}, Added: {_total_added}, Skipped: {_total_skipped}. # of docs in db: {ndocs}"  # noqa
     if not silent:
         print(msg)
@@ -165,7 +188,6 @@ def process_pubs(xgroup: str | None, silent: bool, no_logging: bool, categorize:
 
 
 def main():
-    # process_pubs(None)
     pass
 
 

@@ -1,15 +1,16 @@
 # try out a new feed
 
-import feedparser
 import pprint
 import sys
+
+import feedparser
 
 
 def main(url: str):
     d = feedparser.parse(url)
-    print("feed keys", d.feed.keys())
+    print("feed keys", d.feed.keys()) # type: ignore
     if "title" in d.feed:
-        print(f"Feed title: {d.feed.title}")
+        print(f"Feed title: {d.feed.title}") # type: ignore
     for entry in d.entries:
         pprint.pprint(entry)
 

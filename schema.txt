@@ -1,0 +1,55 @@
+MongoDB Schema for actur
+========================
+
+Database: configured via `database.dbname` in the TOML config.
+
+
+Collection: articles
+--------------------
+
+Primary collection. Documents are raw feedparser entries with several fields
+added/removed before storage.
+
+Field              Type       Source              Notes
+-----------------  ---------  ------------------  -----------------------------------------------
+_id                ObjectId   MongoDB auto        Standard Mongo document ID
+title              string     feedparser          Article headline
+summary            string     feedparser          HTML article summary/excerpt
+link               string     feedparser          URL to the article
+published          string     feedparser          Raw published date string from feed
+published_parsed   struct     feedparser          Parsed date tuple from feed
+pubdate            datetime   computed            datetime built from published_parsed[:6];
+                                                  used for all date queries
+hash               string     computed            First 16 hex chars of SHA-256 of summary;
+                                                  used for dedup
+pubname            string     added               Publication name (e.g. "LeMonde", "FT")
+feedname           string     added               Feed name within the publication
+cat                string     added               Topic category from OpenAI, or "uncategorized"
+(other feedparser) varies     feedparser          Any feedparser fields not explicitly stripped
+
+Fields explicitly removed before storage (stripped in reader.process_feed):
+  - summary_detail
+  - title_detail
+  - guidislink
+  - media_credit
+
+Indexes (created in dbif.init_db):
+  - hash                 (for dedup lookups)
+  - pubdate DESC         (for date-range queries)
+  - summary TEXT         (for full-text search)
+  - pubname              (for publication filtering)
+
+
+Collection: daterange (temp/scratch)
+-------------------------------------
+
+Rebuilt from scratch on every `actu show` query via a $match + $out aggregation
+pipeline from the articles collection. Contains the same document shape as
+articles, filtered to a date window.
+
+Indexes (created after each rebuild):
+  - pubdate DESC
+  - summary TEXT
+
+Fields projected in queries:
+  pubdate, pubname, summary, title, link, published, published_parsed, cat

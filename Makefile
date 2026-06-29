@@ -48,42 +48,41 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 actur tests
+	uv run flake8 actur tests
 lint/black: ## check style with black
-	black --check actur tests
+	uv run black --check actur tests
 
 lint: lint/flake8 lint/black ## check style
 
 test: ## run tests quickly with the default Python
-	pytest
+	uv run pytest
 
 test-all: ## run tests on every Python version with tox
-	tox
+	uv run tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source actur -m pytest
-	coverage report -m
-	coverage html
+	uv run coverage run --source actur -m pytest
+	uv run coverage report -m
+	uv run coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/actur.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ actur
+	uv run sphinx-apidoc -o docs/ actur
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
 servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+	uv run watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release: dist ## package and upload a release
-	twine upload dist/*
+	uv run twine upload dist/*
 
 dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
+	uv build
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+	uv pip install .

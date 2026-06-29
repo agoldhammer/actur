@@ -1,17 +1,15 @@
+import asyncio
 import sys
-from time import sleep
 
 import click
 
-from actur.utils import display, feeds, query
-from actur import reader
+from actur import fix_uncategorized, reader
+from actur.utils import dbif, display, feeds, init_mgr, query
 
 
 @click.group()
 def cli():
-    # click.echo("actu Newsreader")
     pass
-
 
 @cli.command()
 @click.option("--start", "-s", help="start date")
@@ -44,10 +42,16 @@ def show(
             print(20 * "=")
         return 0
     # select articles
-    articles = query.get_arts_in_daterange_from_pubs(
-        pubnames, start, end, days, hours, group
-    )
-    display.display_articles(articles, summary_flag=summary)
+    async def _fetch_and_display():
+        articles = await query.get_arts_in_daterange_from_pubs(
+            pubnames, start, end, days, hours, group
+        )
+        await display.display_articles(articles, summary_flag=summary)
+
+    try:
+        asyncio.run(_fetch_and_display())
+    except Exception as e:
+        print(f"Error showing articles: {e}")
 
     return 0
 
@@ -59,6 +63,7 @@ def show(
 @click.option("--daemon", "-d", is_flag=True, help="Run as daemon")
 @click.option("--sleeptime", type=int, default=1800, help="Time to sleep in secs")
 @click.option("--categorize", is_flag=True, help="Categorize with ChatGPT")
+@click.option("--no-store", "-n", is_flag=True, help="Read feeds only, do not store in database.")
 def read(
     xgroup,
     silent: bool,
@@ -66,20 +71,49 @@ def read(
     daemon: bool,
     sleeptime: int,
     categorize: bool,
+    no_store: bool,
 ):
     """Check news feeds for new articles"""
     try:
         reader.setup_logging()
-        while True:
-            reader.process_pubs(xgroup, silent, no_logging, categorize)
-            if daemon:
-                sleep(sleeptime)
-            else:
-                break
+
+        async def run():
+            await dbif.ensure_indexes()
+            while True:
+                await reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
+                if daemon:
+                    if not silent:
+                        print(f"Sleeping for {sleeptime} seconds...")
+                    await asyncio.sleep(sleeptime)
+                else:
+                    if not silent:
+                        print("Exiting...")
+                    break
+
+        asyncio.run(run())
     except Exception as e:
         print(f"Could not read feeds: {e}")
 
 
+@cli.command("fix-uncategorized")
+@click.option("--dry-run", is_flag=True, help="Preview without writing to database")
+def fix_uncategorized_cmd(dry_run: bool):
+    """Classify articles stored as 'uncategorized' or missing a category"""
+    async def _run():
+        fixed, failed = await fix_uncategorized.fix_uncategorized(dry_run=dry_run)
+        label = "[dry-run] " if dry_run else ""
+        print(f"{label}Done. Fixed: {fixed}, Failed: {failed}")
+
+    try:
+        asyncio.run(_run())
+    except Exception as e:
+        print(f"Error fixing uncategorized articles: {e}")
+        
+def main():
+    init_mgr.init_all()
+    cli()
+
+
 if __name__ == "__main__":
-    print(sys.path)
-    sys.exit(cli())  # pragma: no cover
+    main()
+    sys.exit(0)

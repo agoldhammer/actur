@@ -1,0 +1,56 @@
+[project]
+name = "actur"
+version = "0.1.0"
+description = "news reader using RSS feeds"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    {name = "Art Goldhammer", email = "art.goldhammer@gmail.com"},
+]
+requires-python = ">=3.14"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "click>=8.4.2",
+    "colorama>=0.4.6",
+    "feedparser>=6.0.12",
+    "openai>=2.44.0",
+    "pendulum>=3.2.0",
+    "pymongo>=4.17.0",
+    "sentry-sdk>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/agoldhammer/actur"
+
+[project.scripts]
+actu = "actur.actu_cli:main"
+readnews = "actur.reader:main"
+tryout = "actur.tryout:main"
+
+[dependency-groups]
+dev = [
+    "black>=26.5.1",
+    "bump2version>=1.0.1",
+    "coverage>=7.14.3",
+    "pytest>=9.1.1",
+    "sphinx>=9.1.0",
+    "time-machine>=3.2.0",
+    "tox>=4.56.1",
+    "twine>=6.2.0",
+    "watchdog>=6.0.0",
+    "wheel>=0.47.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["actur", "actur.*"]
