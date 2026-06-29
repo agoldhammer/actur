@@ -1,11 +1,11 @@
 """Unit tests for actur.config.readconf — no live config files required."""
 
 from unittest.mock import MagicMock, patch
+
 import pytest
 
 from actur.config import readconf
 from actur.config.readconf import ActuConfError
-
 
 # ---------------------------------------------------------------------------
 # helpers
@@ -143,8 +143,8 @@ def test_read_conf_merges_feed_conf_into_main():
              patch("builtins.open", side_effect=lambda *a, **kw: _file_mock()), \
              patch("tomllib.load", side_effect=_toml_side_effect(_MAIN_CONF, _FEED_CONF)):
             readconf.read_conf()
-        assert readconf._conf["database"]["dbname"] == "actur"
-        assert readconf._conf["Publications"][0]["name"] == "TestPub"
+        assert readconf._conf["database"]["dbname"] == "actur" # type: ignore
+        assert readconf._conf["Publications"][0]["name"] == "TestPub" # type: ignore
     finally:
         readconf._conf = original
 

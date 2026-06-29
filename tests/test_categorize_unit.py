@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------
@@ -60,7 +59,7 @@ def test_classify_by_title_returns_raw_reply_without_validation():
 
 def test_classify_by_title_returns_none_when_reply_is_none():
     """If the model returns None content, the function should return None."""
-    mock_client = _make_openai_mock(None)
+    mock_client = _make_openai_mock(None) # type: ignore
     with patch("actur.categorize.get_conf_by_key", return_value={"secret_key": _FAKE_KEY}), \
          patch("actur.categorize.AsyncOpenAI", return_value=mock_client):
         from actur import categorize
