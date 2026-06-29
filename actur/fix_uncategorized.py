@@ -1,7 +1,6 @@
-import sentry_sdk
-
 from actur.categorize import classify_by_title
 from actur.utils.dbif import get_uncategorized_articles, update_article_cat
+from actur.utils.sentry_helper import sentry_output
 
 
 async def fix_uncategorized(dry_run: bool = False) -> tuple[int, int]:
@@ -27,7 +26,7 @@ async def fix_uncategorized(dry_run: bool = False) -> tuple[int, int]:
             fixed += 1
         except Exception as e:
             msg = f"Failed to classify {title!r}: {e}"
-            sentry_sdk.capture_message(msg)
+            sentry_output(msg)
             print(msg)
             failed += 1
     return fixed, failed

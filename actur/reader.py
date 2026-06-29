@@ -5,11 +5,10 @@ import os
 import time
 
 import feedparser
-import sentry_sdk
 
 from actur.categorize import classify_by_title
 from actur.config import readconf as rc
-from actur.utils import dbif, feeds, hasher
+from actur.utils import dbif, feeds, hasher, sentry_helper
 
 _total_processed: int = 0
 _total_added: int = 0
@@ -81,7 +80,7 @@ async def process_feed(
         lines.append(20 * "_")
         if d.bozo:
             lines.append(f"XML is ill-formed in feed: {feedname}")
-            sentry_sdk.capture_message(f"XML is ill-formed in feed: {feedname}")
+            sentry_helper.sentry_output(f"XML is ill-formed in feed: {feedname}")
         lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
         bump_processed()
@@ -107,7 +106,7 @@ async def process_feed(
                     category = await classify_by_title(title)
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
-                    sentry_sdk.capture_message(msg)
+                    sentry_helper.sentry_output(msg)
                     if not silent:
                         lines.append(msg)
                     if not no_logging:
@@ -171,7 +170,7 @@ async def process_pubs(
             await parse_pub(pub, silent, no_logging, categorize, no_store)
         except Exception as e:
             msg = f"Could not read {pub.name}: {e}"
-            sentry_sdk.capture_message(msg)
+            sentry_helper.sentry_output(msg)
             if not silent:
                 print(msg)
             if not no_logging:

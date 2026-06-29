@@ -1,6 +1,5 @@
 import pendulum
 import pymongo
-import sentry_sdk
 from bson.json_util import RELAXED_JSON_OPTIONS, dumps
 from pymongo import AsyncMongoClient
 
@@ -31,12 +30,7 @@ def init_db():
         _host = database["url"]
         _dbname = database["dbname"]
         _client = AsyncMongoClient(_host)
-        sentry_conf = rc.get_conf_by_key("sentry")
-        sentry_sdk.init(
-            dsn=sentry_conf["dsn"],
-            traces_sample_rate=sentry_conf["sample_rate"],
-            profiles_sample_rate=sentry_conf["sample_rate"],
-        )
+    
     except Exception as e:
         raise ActuDBError(f"Error initializing database: {e}")
 
