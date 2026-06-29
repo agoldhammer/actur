@@ -1,5 +1,3 @@
-import asyncio
-
 import sentry_sdk
 
 from actur.categorize import classify_by_title
@@ -18,6 +16,9 @@ async def fix_uncategorized(dry_run: bool = False) -> tuple[int, int]:
         title = article.get("title", "")
         try:
             category = await classify_by_title(title)
+            if not category:
+                print(f"Failed to classify {title!r}, defaulting to 'uncategorized'")
+                category = "uncategorized"
             if dry_run:
                 print(f"[dry-run] Would set: {title!r} -> {category}")
             else:

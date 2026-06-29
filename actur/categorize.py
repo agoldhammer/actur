@@ -1,10 +1,6 @@
-import asyncio
-
 from openai import AsyncOpenAI
 
 from actur.config.readconf import get_conf_by_key
-from actur.utils.dbif import init_db
-from actur.utils.query import get_arts_in_daterange_from_pubs
 
 
 async def classify_by_title(title):
@@ -33,27 +29,27 @@ async def classify_by_title(title):
     return reply
 
 
-def main():
-    async def _main():
-        await init_db()
-        count = 0
-        tot_tokens = 0
-        arts = await get_arts_in_daterange_from_pubs(["all"], None, None, None, 2, None)
-        async for art in arts:
-            count += 1
-            print(f"Message {count}")
-            title = art["title"]
-            print(title)
-            n_tokens = len(title.split(" "))
-            tot_tokens += n_tokens
-            category = await classify_by_title(title)
-            print(f"ChatGPT: {category}")
-            await asyncio.sleep(0.03)
-            print("...")
-        print("Total tokens: ", tot_tokens)
+# def main():
+#     async def _main():
+#         init_db()
+#         count = 0
+#         tot_tokens = 0
+#         arts = await get_arts_in_daterange_from_pubs(["all"], None, None, None, 2, None)
+#         async for art in arts:
+#             count += 1
+#             print(f"Message {count}")
+#             title = art["title"]
+#             print(title)
+#             n_tokens = len(title.split(" "))
+#             tot_tokens += n_tokens
+#             category = await classify_by_title(title)
+#             print(f"ChatGPT: {category}")
+#             await asyncio.sleep(0.03)
+#             print("...")
+#         print("Total tokens: ", tot_tokens)
 
-    asyncio.run(_main())
+#     asyncio.run(_main())
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

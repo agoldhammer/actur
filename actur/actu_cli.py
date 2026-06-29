@@ -4,18 +4,12 @@ import sys
 import click
 
 from actur import fix_uncategorized, reader
-from actur.config import read_conf
-from actur.utils import display, feeds, query
-from actur.utils.dbif import init_db
+from actur.utils import dbif, display, feeds, init_mgr, query
 
 
 @click.group()
 def cli():
-    try:
-        read_conf()
-    except Exception as e:
-        print(f"Error initializing actu: {e}")
-        sys.exit(1)
+    pass
 
 @cli.command()
 @click.option("--start", "-s", help="start date")
@@ -49,11 +43,11 @@ def show(
         return 0
     # select articles
     async def _fetch_and_display():
-        await init_db() # type: ignore
+        await dbif.init_db()
         articles = await query.get_arts_in_daterange_from_pubs(
             pubnames, start, end, days, hours, group
         )
-        await display.display_articles(articles, summary_flag=summary)
+        display.display_articles(articles, summary_flag=summary)
 
     try:
         asyncio.run(_fetch_and_display())
@@ -85,7 +79,7 @@ def read(
         reader.setup_logging()
 
         async def run():
-            await init_db()
+            await dbif.init_db()
             while True:
                 await reader.process_pubs(xgroup, silent, no_logging, categorize, no_store)
                 if daemon:
@@ -107,7 +101,7 @@ def read(
 def fix_uncategorized_cmd(dry_run: bool):
     """Classify articles stored as 'uncategorized' or missing a category"""
     async def _run():
-        await init_db()
+        await dbif.init_db()
         fixed, failed = await fix_uncategorized.fix_uncategorized(dry_run=dry_run)
         label = "[dry-run] " if dry_run else ""
         print(f"{label}Done. Fixed: {fixed}, Failed: {failed}")
@@ -116,8 +110,12 @@ def fix_uncategorized_cmd(dry_run: bool):
         asyncio.run(_run())
     except Exception as e:
         print(f"Error fixing uncategorized articles: {e}")
+        
+def main():
+    init_mgr.init_all()
+    cli()
 
 
 if __name__ == "__main__":
-    print(sys.path)
-    sys.exit(cli())  # pragma: no cover
+    main()
+    sys.exit(0)

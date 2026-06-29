@@ -2,7 +2,7 @@ import os
 import tomllib
 from typing import Any
 
-_default_conf_file_path = "~/.actur/local.toml"
+_default_conf_file_path = "~/.actur/default.toml"
 
 _conf: None | dict[str, Any] = None
 
@@ -20,6 +20,7 @@ def read_conf() -> None:
             if conf_from_env is not None:
                 conf_file_path = os.path.expanduser(conf_from_env)
             else:  # use default if no spec in env
+                print("No ACTURCONF environment variable set, using default configuration file")
                 conf_file_path = os.path.expanduser(_default_conf_file_path)
             print(f"Reading configuration from {conf_file_path}")
             with open(conf_file_path, "rb") as fp:
