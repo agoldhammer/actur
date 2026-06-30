@@ -7,9 +7,10 @@ from actur import fix_uncategorized, reader
 from actur.utils import dbif, display, feeds, init_mgr, query
 
 
+@click.version_option(package_name="actur", prog_name="actu",)
 @click.group()
 def cli():
-    pass
+    init_mgr.init_all()
 
 @cli.command()
 @click.option("--start", "-s", help="start date")
@@ -108,9 +109,8 @@ def fix_uncategorized_cmd(dry_run: bool):
         asyncio.run(_run())
     except Exception as e:
         print(f"Error fixing uncategorized articles: {e}")
-        
+
 def main():
-    init_mgr.init_all()
     cli()
 
 
