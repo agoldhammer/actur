@@ -7,7 +7,7 @@ from actur import fix_uncategorized, reader
 from actur.utils import dbif, display, feeds, init_mgr, query
 
 
-@click.version_option(package_name="actur", prog_name="actu",)
+@click.version_option(None, "--version", "-v", package_name="actur", prog_name="actu",)
 @click.group()
 def cli():
     init_mgr.init_all()
