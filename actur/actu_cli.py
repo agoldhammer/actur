@@ -121,6 +121,7 @@ def read(
 
         async def run():
             await dbif.ensure_indexes()
+            cycle = 0
             while True:
                 await reader.process_pubs(
                     xgroup, silent, no_logging, categorize, no_store, logger
@@ -128,6 +129,11 @@ def read(
                 if daemon:
                     if not silent:
                         print(f"Sleeping for {sleeptime} seconds...")
+                    if not no_logging:
+                        cycle += 1
+                        logger.info(
+                            f"***Sleeping cycle {cycle} for {sleeptime} seconds..."
+                        )
                     await asyncio.sleep(sleeptime)
                 else:
                     if not silent:
