@@ -22,6 +22,5 @@ def init_sentry():
 def sentry_output(msg):
     if _sentry_initialized:
         sentry_sdk.capture_message(msg)
-        sentry_sdk.flush(timeout=2.0)
     else:
         print(f"Sentry not initialized, cannot capture message {msg}.")
