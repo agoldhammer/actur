@@ -80,7 +80,7 @@ async def process_feed(
         lines.append(20 * "_")
         if d.bozo:
             lines.append(f"XML is ill-formed in feed: {feedname}")
-            sentry_helper.sentry_output(f"XML is ill-formed in feed: {feedname}")
+            await sentry_helper.sentry_output(f"XML is ill-formed in feed: {feedname}")
         lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
         bump_processed()
@@ -106,7 +106,7 @@ async def process_feed(
                     category = await classify_by_title(title)
                 except Exception as e:
                     msg = f"Classifier exception on title {title}: {e}"
-                    sentry_helper.sentry_output(msg)
+                    await sentry_helper.sentry_output(msg)
                     if not silent:
                         lines.append(msg)
                     if not no_logging:
@@ -170,7 +170,7 @@ async def process_pubs(
             await parse_pub(pub, silent, no_logging, categorize, no_store)
         except Exception as e:
             msg = f"Could not read {pub.name}: {e}"
-            sentry_helper.sentry_output(msg)
+            await sentry_helper.sentry_output(msg)
             if not silent:
                 print(msg)
             if not no_logging:

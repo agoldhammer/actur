@@ -26,7 +26,7 @@ async def fix_uncategorized(dry_run: bool = False) -> tuple[int, int]:
             fixed += 1
         except Exception as e:
             msg = f"Failed to classify {title!r}: {e}"
-            sentry_output(msg)
+            await sentry_output(msg)
             print(msg)
             failed += 1
     return fixed, failed

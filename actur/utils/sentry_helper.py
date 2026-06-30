@@ -19,8 +19,9 @@ def init_sentry():
     else:
         print("Sentry not initialized due to missing configuration.")
     
-def sentry_output(msg):
+async def sentry_output(msg):
     if _sentry_initialized:
         sentry_sdk.capture_message(msg)
+        await sentry_sdk.flush_async()
     else:
         print(f"Sentry not initialized, cannot capture message {msg}.")
