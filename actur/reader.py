@@ -80,6 +80,9 @@ async def process_feed(
         lines.append(20 * "_")
         if d.bozo:
             lines.append(f"XML is ill-formed in feed: {feedname}")
+            msg = f"XML is ill-formed in feed: {feedname}, bozo_exception: {d.bozo_exception}"
+            if not no_logging:
+                _logger.error(msg)
             await sentry_helper.sentry_output(f"XML is ill-formed in feed: {feedname}")
         lines.append(f"no. entries {len(d.entries)}")
     for entry in d.entries:
