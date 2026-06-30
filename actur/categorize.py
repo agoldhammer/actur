@@ -2,9 +2,17 @@ from openai import AsyncOpenAI
 
 from actur.config.readconf import get_conf_by_key
 
+_client: AsyncOpenAI | None = None
+
+
+def _get_client() -> AsyncOpenAI:
+    global _client
+    if _client is None:
+        _client = AsyncOpenAI(api_key=get_conf_by_key("openai")["secret_key"])
+    return _client
+
 
 async def classify_by_title(title):
-    client = AsyncOpenAI(api_key=get_conf_by_key("openai")["secret_key"])
     user_msg = " ".join(
         [
             "Classify this text as",
@@ -18,7 +26,7 @@ async def classify_by_title(title):
             ". Reply should consist solely of category, without explanation.",
         ]
     )
-    chat = await client.chat.completions.create(
+    chat = await _get_client().chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant"},

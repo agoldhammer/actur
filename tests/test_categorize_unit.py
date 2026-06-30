@@ -12,6 +12,17 @@ import pytest
 _FAKE_KEY = "sk-test-key-123"
 
 
+@pytest.fixture(autouse=True)
+def _reset_cached_client():
+    """classify_by_title caches its AsyncOpenAI client at module scope; clear it
+    between tests so each test's AsyncOpenAI patch takes effect."""
+    from actur import categorize
+
+    categorize._client = None
+    yield
+    categorize._client = None
+
+
 def _make_openai_mock(reply_content="US Politics"):
     """Return a mock AsyncOpenAI instance whose chat.completions.create coroutine
     resolves to a response with the given content string."""
