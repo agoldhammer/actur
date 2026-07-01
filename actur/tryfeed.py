@@ -8,20 +8,23 @@ import feedparser
 
 def main(url: str):
     d = feedparser.parse(url)
-    print("feed keys", d.feed.keys()) # type: ignore
+    print(f"bozo {d.bozo}")  # type: ignore
+    print("feed keys", d.feed.keys())  # type: ignore
+    if "summary" in d.feed:
+        print(f"Feed summary: {d.feed.summary}")  # type: ignore
     if "title" in d.feed:
-        print(f"Feed title: {d.feed.title}") # type: ignore
+        print(f"Feed title: {d.feed.title}")  # type: ignore
     for entry in d.entries:
-        pprint.pprint(entry)
+        pprint.pprint(
+            f"entry.title: {entry.title}, entry.summary: {entry.summary}, entry.published: {entry.published}, entry.pubname: {entry.link}"
+        )  # type: ignore
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         url = sys.argv[1]
     else:
-        url = (
-            "https://www.ft.com/myft/following/126e6584-dcdf-4320-9a28-2c4a614e7c0c.rss"
-        )
+        url = "http://xml2.corriereobjects.it/feed-hp/homepage.xml"
     main(url)
 
 """
