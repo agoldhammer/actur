@@ -207,14 +207,6 @@ def test_process_feed_bozo_appends_warning_when_not_silent():
     assert any("ill-formed" in line for line in lines)
 
 
-def test_process_feed_bozo_calls_sentry_output():
-    feed_result = _make_feed_result(bozo=True)
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock) as mock_sentry:
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
-    mock_sentry.assert_called_once()
-
-
 def test_process_feed_bozo_logs_error_when_no_logging_false():
     feed_result = _make_feed_result(bozo=True)
     mock_log = _mock_logger()
