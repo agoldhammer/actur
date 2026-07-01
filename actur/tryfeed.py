@@ -1,6 +1,5 @@
 # try out a new feed
 
-import pprint
 import sys
 
 import feedparser
@@ -8,15 +7,16 @@ import feedparser
 
 def main(url: str):
     d = feedparser.parse(url)
-    print(f"bozo {d.bozo}")  # type: ignore
+    if d.bozo:
+        print(f"bozo {d.bozo} error {d.bozo_exception}")
     print("feed keys", d.feed.keys())  # type: ignore
     if "summary" in d.feed:
         print(f"Feed summary: {d.feed.summary}")  # type: ignore
     if "title" in d.feed:
         print(f"Feed title: {d.feed.title}")  # type: ignore
     for entry in d.entries:
-        pprint.pprint(
-            f"entry.title: {entry.title}, entry.summary: {entry.summary}, entry.published: {entry.published}, entry.pubname: {entry.link}"
+        print(
+            f"entry.title: {entry.title}\n  entry.summary: {entry.summary}\n  entry.published: {entry.published}\n  entry.pubname: {entry.link}\n\n"
         )  # type: ignore
 
 
