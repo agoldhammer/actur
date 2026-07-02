@@ -61,11 +61,18 @@ async def process_feed(
         lines.append(20 * "_")
         lines.append(f"no. entries {len(d.entries)}")
     if d.bozo:
-        msg = f"feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
-        lines.append(msg)
-        if not no_logging:
-            logger.error(msg)
-            # await sentry_helper.sentry_output(f"XML is ill-formed in feed: {feedname}")
+        # deal with annoying ascii/utf-8 issue in Corriere and perhaps others
+        if "declared as us_ascii" in str(d.bozo_exception):
+            if not silent:
+                # add to print output, but not to logger, since this is a known issue
+                lines.append(
+                    f"!!!feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
+                )
+        else:
+            msg = f"feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
+            lines.append(msg)
+            if not no_logging:
+                logger.error(msg)
     for entry in d.entries:
         bump_processed()
         if entry.published_parsed:
