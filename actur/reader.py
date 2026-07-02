@@ -69,7 +69,7 @@ async def process_feed(
         lines.append(f"no. entries {len(d.entries)}")
     if d.bozo:
         # deal with annoying ascii/utf-8 issue in Corriere and perhaps others
-        if "declared as us_ascii" in str(d.bozo_exception):
+        if "declared as us-ascii" in str(d.bozo_exception):
             if not silent:
                 # add to print output, but not to logger, since this is a known issue
                 lines.append(
