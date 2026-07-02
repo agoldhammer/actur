@@ -185,8 +185,10 @@ def test_process_feed_not_silent_includes_entry_count():
 
 
 def test_process_feed_bozo_appends_warning_when_not_silent():
+    # us-ascii bozo exceptions are appended to the printed lines instead of logged
     feed = _make_feed(name="bad-feed")
     feed_result = _make_feed_result(bozo=True)
+    feed_result.bozo_exception = Exception("document declared as us-ascii, but parsed as utf-8")
     with patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
         lines = _run(reader.process_feed(feed_result, feed, "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert any("bozo error" in line for line in lines)
