@@ -69,16 +69,15 @@ async def process_feed(
         lines.append(f"no. entries {len(d.entries)}")
     if d.bozo:
         # deal with annoying ascii/utf-8 issue in Corriere and perhaps others
-        if "declared as us-ascii" in str(d.bozo_exception):
-            if not silent:
-                # add to print output, but not to logger, since this is a known issue
-                lines.append(
-                    f"!!!feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
-                )
-        else:
-            if not no_logging:
-                msg = f"feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
-                logger.error(msg)
+        if not silent:
+            # add to print output in all cases
+            lines.append(
+                f"!!!feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
+            )
+        if not no_logging and "declared as us-ascii" not in str(d.bozo_exception):
+            # log the error unless it's the annoying Corriere ascii/utf-8 issue
+            msg = f"feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
+            logger.error(msg)
     for entry in d.entries:
         bump_processed()
         if entry.published_parsed:
