@@ -75,11 +75,9 @@ async def process_feed(
                 lines.append(
                     f"!!!feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
                 )
-            else:
-                pass
         else:
-            msg = f"feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
             if not no_logging:
+                msg = f"feedparser bozo error in feed: {feedname}, bozo_exception: {d.bozo_exception}"
                 logger.error(msg)
     for entry in d.entries:
         bump_processed()
