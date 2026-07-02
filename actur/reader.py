@@ -1,11 +1,19 @@
 import asyncio
 import datetime
+import socket
 from logging import Logger
 
 import feedparser
 
 from actur.categorize import classify_by_title
 from actur.utils import dbif, feeds, hasher, sentry_helper
+
+# feedparser.parse() does a blocking network fetch with no built-in timeout;
+# a stalled server (e.g. WaPo) can hang the underlying socket read forever,
+# which in turn hangs the asyncio.to_thread task waiting on it. Set a
+# process-wide socket default timeout so the blocking call itself gives up.
+FEED_FETCH_TIMEOUT = 30
+socket.setdefaulttimeout(FEED_FETCH_TIMEOUT)
 
 _total_processed: int = 0
 _total_added: int = 0
@@ -42,6 +50,7 @@ def pcounters():
 
 
 async def process_feed(
+    d: feedparser.FeedParserDict,
     feed: feeds.Feed,
     pubname: str,
     silent: bool,
@@ -50,12 +59,10 @@ async def process_feed(
     no_store: bool,
     logger: Logger,
 ) -> list[str]:
-    """Fetch, parse, and store one feed; returns buffered output lines."""
+    """Parse and store one already-fetched feed; returns buffered output lines."""
     lines: list[str] = []
     bump_processed, bump_added, bump_skipped, get_counts = pcounters()
     feedname = feed.name
-    url = feed.url
-    d = await asyncio.to_thread(feedparser.parse, url)
     if not silent:
         lines.append(f"+++\nFeed: {feedname}")
         lines.append(20 * "_")
@@ -119,6 +126,25 @@ async def process_feed(
     return lines
 
 
+async def fetch_feed(
+    feed: feeds.Feed, silent: bool, no_logging: bool, logger: Logger
+) -> feedparser.FeedParserDict | None:
+    """Parse one feed off-thread, bailing out after FEED_FETCH_TIMEOUT rather
+    than letting a stalled server hang the whole read."""
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(feedparser.parse, feed.url), timeout=FEED_FETCH_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        msg = f"Timed out fetching feed {feed.name} ({feed.url}) after {FEED_FETCH_TIMEOUT}s"
+        if not silent:
+            print(msg)
+        if not no_logging:
+            if "washingtonpost" not in feed.url:
+                logger.error(msg)
+        return None
+
+
 async def parse_pub(
     pub: feeds.Publication,
     silent: bool,
@@ -130,12 +156,17 @@ async def parse_pub(
     if not silent:
         print("\nPublication:", pub.name)
         print(20 * "*")
+    parsed_feeds = await asyncio.gather(
+        *[fetch_feed(feed, silent, no_logging, logger) for feed in pub.feeds]
+    )
+
     feed_outputs = await asyncio.gather(
         *[
             process_feed(
-                feed, pub.name, silent, no_logging, categorize, no_store, logger
+                d, feed, pub.name, silent, no_logging, categorize, no_store, logger
             )
-            for feed in pub.feeds
+            for d, feed in zip(parsed_feeds, pub.feeds)
+            if d is not None
         ]
     )
     for feed_lines in feed_outputs:

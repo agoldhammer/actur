@@ -163,97 +163,77 @@ def test_pcounters_independent_counter_sets():
 # ---------------------------------------------------------------------------
 
 
-def test_process_feed_calls_feedparser_parse_via_to_thread():
-    feed = _make_feed(url="https://example.com/rss")
-    feed_result = _make_feed_result()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result) as mock_tt, \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
-        _run(reader.process_feed(feed, "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
-    args = mock_tt.call_args[0]
-    assert args[0] is feedparser.parse
-    assert args[1] == "https://example.com/rss"
-
-
 def test_process_feed_returns_empty_list_when_silent_and_no_entries():
     feed_result = _make_feed_result()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result):
-        lines = _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    lines = _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert lines == []
 
 
 def test_process_feed_not_silent_includes_feed_name():
     feed = _make_feed(name="my-feed")
     feed_result = _make_feed_result()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result):
-        lines = _run(reader.process_feed(feed, "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    lines = _run(reader.process_feed(feed_result, feed, "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert any("my-feed" in line for line in lines)
 
 
 def test_process_feed_not_silent_includes_entry_count():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
-        lines = _run(reader.process_feed(_make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
+        lines = _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert any("no. entries 1" in line for line in lines)
 
 
 def test_process_feed_bozo_appends_warning_when_not_silent():
     feed = _make_feed(name="bad-feed")
     feed_result = _make_feed_result(bozo=True)
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
-        lines = _run(reader.process_feed(feed, "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
-    assert any("ill-formed" in line for line in lines)
+    with patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
+        lines = _run(reader.process_feed(feed_result, feed, "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    assert any("bozo error" in line for line in lines)
 
 
 def test_process_feed_bozo_logs_error_when_no_logging_false():
     feed_result = _make_feed_result(bozo=True)
     mock_log = _mock_logger()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
+    with patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
         # silent=False required: bozo logging is only reached inside the `if not silent` block
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=False, no_logging=False, categorize=False, no_store=False, logger=mock_log))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=False, no_logging=False, categorize=False, no_store=False, logger=mock_log))
     mock_log.error.assert_called_once()
 
 
 def test_process_feed_bozo_skips_log_when_no_logging_true():
     feed_result = _make_feed_result(bozo=True)
     mock_log = _mock_logger()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
+    with patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
         # silent=False to reach the bozo block; no_logging=True to skip the logger call
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=mock_log))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=mock_log))
     mock_log.error.assert_not_called()
 
 
 def test_process_feed_skips_entry_already_in_db():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock) as mock_save:
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     mock_save.assert_not_called()
 
 
 def test_process_feed_saves_new_entry():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock) as mock_save:
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     mock_save.assert_called_once_with(entry)
 
 
 def test_process_feed_strips_noisy_fields_from_new_entry():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     for field in ("summary_detail", "title_detail", "guidislink", "media_credit"):
         assert field not in entry, f"Expected {field!r} to be stripped from entry"
 
@@ -262,10 +242,9 @@ def test_process_feed_sets_pubname_and_feedname_on_new_entry():
     entry = _make_entry()
     feed = _make_feed(name="rss-feed")
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock):
-        _run(reader.process_feed(feed, "MyPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, feed, "MyPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert entry["pubname"] == "MyPub"
     assert entry["feedname"] == "rss-feed"
 
@@ -273,39 +252,35 @@ def test_process_feed_sets_pubname_and_feedname_on_new_entry():
 def test_process_feed_sets_pubdate_from_published_parsed():
     entry = _make_entry(published_parsed=(2024, 3, 15, 10, 30, 0, 0, 75, 0))
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert entry["pubdate"] == datetime.datetime(2024, 3, 15, 10, 30, 0)
 
 
 def test_process_feed_skips_pubdate_when_published_parsed_is_none():
     entry = _make_entry(published_parsed=None)
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=True):
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert "pubdate" not in entry
 
 
 def test_process_feed_sets_cat_to_uncategorized_without_categorize():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert entry["cat"] == "uncategorized"
 
 
 def test_process_feed_calls_classify_and_sets_cat_when_categorize():
     entry = _make_entry(title="Fed raises rates")
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock), \
          patch("actur.reader.classify_by_title", new_callable=AsyncMock, return_value="Finance") as mock_clf:
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=True, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=True, no_store=False, logger=_mock_logger()))
     mock_clf.assert_called_once_with("Fed raises rates")
     assert entry["cat"] == "Finance"
 
@@ -313,12 +288,11 @@ def test_process_feed_calls_classify_and_sets_cat_when_categorize():
 def test_process_feed_classifier_exception_defaults_cat_to_uncategorized():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock), \
          patch("actur.reader.classify_by_title", new_callable=AsyncMock, side_effect=RuntimeError("timeout")), \
          patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=True, no_store=False, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=True, no_store=False, logger=_mock_logger()))
     assert entry["cat"] == "uncategorized"
 
 
@@ -326,12 +300,11 @@ def test_process_feed_classifier_exception_logs_error():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
     mock_log = _mock_logger()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock), \
          patch("actur.reader.classify_by_title", new_callable=AsyncMock, side_effect=RuntimeError("timeout")), \
          patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=False, categorize=True, no_store=False, logger=mock_log))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=False, categorize=True, no_store=False, logger=mock_log))
     mock_log.error.assert_called_once()
 
 
@@ -339,32 +312,29 @@ def test_process_feed_classifier_exception_no_logging_skips_log():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
     mock_log = _mock_logger()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock), \
          patch("actur.reader.classify_by_title", new_callable=AsyncMock, side_effect=RuntimeError("timeout")), \
          patch("actur.utils.sentry_helper.sentry_output", new_callable=AsyncMock):
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=True, no_store=False, logger=mock_log))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=True, no_store=False, logger=mock_log))
     mock_log.error.assert_not_called()
 
 
 def test_process_feed_no_store_skips_save_article():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock) as mock_save:
-        _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=True, logger=_mock_logger()))
+        _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=True, logger=_mock_logger()))
     mock_save.assert_not_called()
 
 
 def test_process_feed_no_store_appends_would_have_stored_line():
     entry = _make_entry(title="Big news")
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock):
-        lines = _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=True, logger=_mock_logger()))
+        lines = _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=True, logger=_mock_logger()))
     combined = "\n".join(lines)
     assert "Would have stored" in combined
     assert "Big news" in combined
@@ -373,10 +343,9 @@ def test_process_feed_no_store_appends_would_have_stored_line():
 def test_process_feed_not_silent_appends_saving_line_for_new_entry():
     entry = _make_entry(title="Breaking news")
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock):
-        lines = _run(reader.process_feed(_make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        lines = _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     combined = "\n".join(lines)
     assert "saving" in combined
     assert "Breaking news" in combined
@@ -385,10 +354,9 @@ def test_process_feed_not_silent_appends_saving_line_for_new_entry():
 def test_process_feed_not_silent_appends_counts_summary():
     entry = _make_entry()
     feed_result = _make_feed_result(entries=[entry])
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result), \
-         patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
+    with patch("actur.utils.dbif.is_summary_in_db", new_callable=AsyncMock, return_value=False), \
          patch("actur.utils.dbif.save_article", new_callable=AsyncMock):
-        lines = _run(reader.process_feed(_make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+        lines = _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     combined = "\n".join(lines)
     assert "Processed:" in combined
     assert "Added:" in combined
@@ -397,9 +365,52 @@ def test_process_feed_not_silent_appends_counts_summary():
 
 def test_process_feed_returns_list():
     feed_result = _make_feed_result()
-    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result):
-        result = _run(reader.process_feed(_make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    result = _run(reader.process_feed(feed_result, _make_feed(), "TestPub", silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert isinstance(result, list)
+
+
+# ---------------------------------------------------------------------------
+# fetch_feed
+# ---------------------------------------------------------------------------
+
+
+def test_fetch_feed_returns_parsed_result():
+    feed_result = _make_feed_result()
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result):
+        result = _run(reader.fetch_feed(_make_feed(), silent=True, no_logging=True, logger=_mock_logger()))
+    assert result is feed_result
+
+
+def test_fetch_feed_returns_none_on_timeout():
+    async def _hang(*args, **kwargs):
+        await asyncio.sleep(10)
+
+    with patch("asyncio.to_thread", side_effect=_hang), \
+         patch("actur.reader.FEED_FETCH_TIMEOUT", 0.01):
+        result = _run(reader.fetch_feed(_make_feed(), silent=True, no_logging=True, logger=_mock_logger()))
+    assert result is None
+
+
+def test_fetch_feed_logs_error_on_timeout():
+    async def _hang(*args, **kwargs):
+        await asyncio.sleep(10)
+
+    mock_log = _mock_logger()
+    with patch("asyncio.to_thread", side_effect=_hang), \
+         patch("actur.reader.FEED_FETCH_TIMEOUT", 0.01):
+        _run(reader.fetch_feed(_make_feed(), silent=True, no_logging=False, logger=mock_log))
+    mock_log.error.assert_called_once()
+
+
+def test_fetch_feed_no_logging_skips_log_on_timeout():
+    async def _hang(*args, **kwargs):
+        await asyncio.sleep(10)
+
+    mock_log = _mock_logger()
+    with patch("asyncio.to_thread", side_effect=_hang), \
+         patch("actur.reader.FEED_FETCH_TIMEOUT", 0.01):
+        _run(reader.fetch_feed(_make_feed(), silent=True, no_logging=True, logger=mock_log))
+    mock_log.error.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
@@ -407,32 +418,60 @@ def test_process_feed_returns_list():
 # ---------------------------------------------------------------------------
 
 
+def test_parse_pub_skips_process_feed_for_timed_out_fetch():
+    feed1 = _make_feed("f1", "https://a.com")
+    feed2 = _make_feed("f2", "https://b.com")
+    pub = _make_pub(pub_feeds=[feed1, feed2])
+    with patch("actur.reader.fetch_feed", new_callable=AsyncMock, side_effect=[_make_feed_result(), None]), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]) as mock_pf:
+        _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    assert mock_pf.call_count == 1
+
+
+def test_parse_pub_fetches_feedparser_result_via_to_thread():
+    feed1 = _make_feed("f1", "https://a.com")
+    feed2 = _make_feed("f2", "https://b.com")
+    pub = _make_pub(pub_feeds=[feed1, feed2])
+    feed_result = _make_feed_result()
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=feed_result) as mock_tt, \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
+        _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
+    assert mock_tt.call_count == 2
+    urls = {call.args[1] for call in mock_tt.call_args_list}
+    assert mock_tt.call_args_list[0].args[0] is feedparser.parse
+    assert urls == {"https://a.com", "https://b.com"}
+
+
 def test_parse_pub_calls_process_feed_for_each_feed():
     feed1 = _make_feed("f1", "https://a.com")
     feed2 = _make_feed("f2", "https://b.com")
     pub = _make_pub(pub_feeds=[feed1, feed2])
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]) as mock_pf:
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]) as mock_pf:
         _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert mock_pf.call_count == 2
 
 
 def test_parse_pub_prints_pub_name_when_not_silent(capsys):
     pub = _make_pub(name="Reuters")
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
         _run(reader.parse_pub(pub, silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert "Reuters" in capsys.readouterr().out
 
 
 def test_parse_pub_silent_suppresses_pub_name(capsys):
     pub = _make_pub(name="Reuters")
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
         _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert "Reuters" not in capsys.readouterr().out
 
 
 def test_parse_pub_prints_lines_returned_by_process_feed(capsys):
     pub = _make_pub()
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=["line one", "line two"]):
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=["line one", "line two"]):
         _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     out = capsys.readouterr().out
     assert "line one" in out
@@ -441,14 +480,16 @@ def test_parse_pub_prints_lines_returned_by_process_feed(capsys):
 
 def test_parse_pub_prints_done_message_when_not_silent(capsys):
     pub = _make_pub(name="FT")
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
         _run(reader.parse_pub(pub, silent=False, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert "Done with pub FT" in capsys.readouterr().out
 
 
 def test_parse_pub_silent_suppresses_done_message(capsys):
     pub = _make_pub(name="FT")
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]):
         _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=False, no_store=False, logger=_mock_logger()))
     assert "Done with pub FT" not in capsys.readouterr().out
 
@@ -456,15 +497,16 @@ def test_parse_pub_silent_suppresses_done_message(capsys):
 def test_parse_pub_passes_args_through_to_process_feed():
     pub = _make_pub(pub_feeds=[_make_feed("f1")])
     mock_log = _mock_logger()
-    with patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]) as mock_pf:
+    with patch("asyncio.to_thread", new_callable=AsyncMock, return_value=_make_feed_result()), \
+         patch("actur.reader.process_feed", new_callable=AsyncMock, return_value=[]) as mock_pf:
         _run(reader.parse_pub(pub, silent=True, no_logging=True, categorize=True, no_store=True, logger=mock_log))
-    # positional: feed, pubname, silent, no_logging, categorize, no_store, logger
+    # positional: d, feed, pubname, silent, no_logging, categorize, no_store, logger
     call_args = mock_pf.call_args[0]
-    assert call_args[2] is True    # silent
-    assert call_args[3] is True    # no_logging
-    assert call_args[4] is True    # categorize
-    assert call_args[5] is True    # no_store
-    assert call_args[6] is mock_log
+    assert call_args[3] is True    # silent
+    assert call_args[4] is True    # no_logging
+    assert call_args[5] is True    # categorize
+    assert call_args[6] is True    # no_store
+    assert call_args[7] is mock_log
 
 
 # ---------------------------------------------------------------------------
