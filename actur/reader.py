@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import socket
 from logging import Logger
+from typing import cast
 
 import feedparser
 
@@ -83,9 +84,10 @@ async def process_feed(
         if entry.published_parsed:
             dt = datetime.datetime(*entry.published_parsed[:6])  # pyright: ignore[reportArgumentType]
             entry["pubdate"] = dt
-        ehash = hasher.ag_hash(entry.summary)  # pyright: ignore[reportArgumentType]
+        normalized_summary = hasher.normalize_summary(cast(str, entry.summary))
+        ehash = hasher.ag_hash(normalized_summary)
         entry["hash"] = ehash
-        already_in = await dbif.is_summary_in_db(ehash, entry.summary)
+        already_in = await dbif.is_summary_in_db(ehash, normalized_summary)
         if already_in:
             bump_skipped()
         else:

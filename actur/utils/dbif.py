@@ -4,6 +4,7 @@ from bson.json_util import RELAXED_JSON_OPTIONS, dumps
 from pymongo import AsyncMongoClient
 
 from actur.config import readconf as rc
+from actur.utils import hasher
 
 _host: str | None = None
 _client: AsyncMongoClient | None = None
@@ -53,10 +54,10 @@ async def get_article_count() -> int:
     return await db.articles.count_documents({})
 
 
-async def is_summary_in_db(target_hash, summary):
+async def is_summary_in_db(target_hash, normalized_summary):
     db = get_db()
     async for article in db.articles.find({"hash": target_hash}):
-        if article["summary"] == summary:
+        if hasher.normalize_summary(article["summary"]) == normalized_summary:
             return True
     return False
 
